@@ -1,66 +1,125 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import styles from "./page.module.scss";
+import imageMap from "../data/image-map.json";
+import { useRecipesAccess } from "./state/recipes-context";
+import CategoryChip from "../components/CategoryChip/CategoryChip";
+import FeaturedItem from "../components/FeaturedItem/FeaturedItem";
+import HomeHero from "../components/HomeHero/HomeHero";
+import RecipeCard from "../components/RecipeCard/RecipeCard";
+import type { ImageMap, Recipe, RecipesData } from "../types/recipes";
+
+const featuredCountFallback = 5;
+const allCategory = "Todas";
+
+function getImageUrl(recipe: Recipe) {
+  if (recipe.foto.startsWith("http") || recipe.foto.startsWith("/uploads/")) {
+    return recipe.foto;
+  }
+
+  return (imageMap as ImageMap)[recipe.foto] ?? "";
+}
 
 export default function Home() {
+  const { accessById } = useRecipesAccess();
+  const [activeCategory, setActiveCategory] = useState(allCategory);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+
+  useEffect(() => {
+    const run = async () => {
+      const response = await fetch("/api/receitas", { cache: "no-store" });
+      const data = (await response.json()) as RecipesData;
+      setRecipes(data.receitas ?? []);
+    };
+
+    void run();
+  }, []);
+
+  const featuredCount = featuredCountFallback;
+  const categories = Array.from(new Set(recipes.map((recipe) => recipe.tipo)));
+
+  const featuredRecipes = useMemo(() => {
+    return [...recipes]
+      .sort((first, second) => {
+        const firstAccess = accessById[first.id] ?? first.acessos ?? 0;
+        const secondAccess = accessById[second.id] ?? second.acessos ?? 0;
+
+        return secondAccess - firstAccess;
+      })
+      .slice(0, featuredCount);
+  }, [accessById, featuredCount, recipes]);
+
+  const heroRecipe = featuredRecipes[0] ?? recipes[0];
+  const heroImage = heroRecipe ? getImageUrl(heroRecipe) : "";
+
+  const filteredRecipes = useMemo(() => {
+    if (activeCategory === allCategory) {
+      return recipes;
+    }
+
+    return recipes.filter((recipe) => recipe.tipo === activeCategory);
+  }, [activeCategory, recipes]);
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+        <HomeHero heroRecipe={heroRecipe ?? null} heroImage={heroImage} />
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2>Explore por categoria</h2>
+            <p>Doces, massas, entradas e outras delicias do acervo.</p>
+          </div>
+          <div className={styles.categoryGrid}>
+            {[allCategory, ...categories].map((category) => (
+              <CategoryChip
+                key={category}
+                label={category}
+                isActive={category === activeCategory}
+                onSelect={setActiveCategory}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.recipesLayout} id="receitas">
+          <div className={styles.recipesMain}>
+            <div className={styles.sectionHeader}>
+              <h2>Todas as receitas</h2>
+              <p>Da cozinha do Marcelo para o seu dia a dia.</p>
+            </div>
+            <div className={styles.cardGrid}>
+              {filteredRecipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  imageUrl={getImageUrl(recipe)}
+                />
+              ))}
+            </div>
+          </div>
+          <aside className={styles.sidebar}>
+            <div className={styles.sectionHeader}>
+              <h2>Receitas em destaque</h2>
+              <p>As mais acessadas do momento.</p>
+            </div>
+            <div className={styles.featuredList}>
+              {featuredRecipes.map((recipe) => (
+                <FeaturedItem
+                  key={recipe.id}
+                  recipe={recipe}
+                  imageUrl={getImageUrl(recipe)}
+                />
+              ))}
+            </div>
+          </aside>
+        </section>
       </main>
+
+      <footer className={styles.footer}>
+        <p>Receitas do Marcelo - feito com carinho para reunir a familia.</p>
+      </footer>
     </div>
   );
 }

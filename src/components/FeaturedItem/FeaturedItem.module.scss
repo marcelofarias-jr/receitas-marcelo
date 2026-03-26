@@ -1,0 +1,59 @@
+.featuredCard {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.6rem;
+  border-radius: var(--radius-md);
+  background: #fffaf3;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.featuredCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+}
+
+.featuredThumb {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  height: 72px;
+}
+
+.featuredThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, #f6e8d9, #f0d7c1);
+}
+
+.featuredBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.cardTag {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15rem;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.featuredTitle {
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.featuredMeta {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}

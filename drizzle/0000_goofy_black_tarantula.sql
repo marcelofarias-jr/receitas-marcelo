@@ -1,0 +1,20 @@
+CREATE TABLE "recipes" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"slug" text NOT NULL,
+	"deleted" boolean DEFAULT false NOT NULL,
+	"foto" text NOT NULL,
+	"titulo" text NOT NULL,
+	"resumo" text NOT NULL,
+	"igredientes" jsonb NOT NULL,
+	"preparo" jsonb NOT NULL,
+	"vegano" boolean DEFAULT false NOT NULL,
+	"tipo" text NOT NULL,
+	"culinaria" jsonb NOT NULL,
+	"tempo_de_preparo" text NOT NULL,
+	"rendimento" text NOT NULL,
+	"acessos" integer DEFAULT 0 NOT NULL,
+	"destaque" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "recipes_slug_unique" UNIQUE("slug")
+);

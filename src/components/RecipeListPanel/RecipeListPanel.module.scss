@@ -1,0 +1,97 @@
+.listPanel {
+  background: var(--color-card);
+  padding: 1.8rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.panelHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.panelHeader p {
+  color: var(--color-muted);
+}
+
+.listHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.newButton {
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.recipeList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow: auto;
+}
+
+.recipeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid transparent;
+  background: #fffaf3;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.recipeActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.iconButton {
+  border: 1px solid var(--color-border);
+  background: #fff;
+  color: var(--color-ink);
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dangerButton {
+  border-color: #5b1a14;
+  color: #5b1a14;
+}
+
+.recipeItemActive {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-soft);
+}
+
+.loadingText {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}

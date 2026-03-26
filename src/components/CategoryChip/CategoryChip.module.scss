@@ -1,0 +1,25 @@
+.categoryChip {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-secondary);
+  font-weight: 600;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.categoryChip:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-primary);
+}
+
+.categoryChipActive {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}

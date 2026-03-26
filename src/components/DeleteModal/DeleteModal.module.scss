@@ -1,0 +1,40 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(29, 23, 19, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal {
+  width: min(100%, 420px);
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.modalActions button {
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+  cursor: pointer;
+}
+
+.danger {
+  background: #5b1a14;
+  color: #fff;
+  border-color: #5b1a14;
+}
