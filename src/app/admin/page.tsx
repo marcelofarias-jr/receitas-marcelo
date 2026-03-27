@@ -68,6 +68,11 @@ export default function AdminPage() {
     [recipes, selectedSlug],
   );
 
+  const availableTypes = useMemo(() => {
+    const types = new Set(recipes.map((recipe) => recipe.tipo).filter(Boolean));
+    return Array.from(types).sort();
+  }, [recipes]);
+
   const fetchRecipes = useCallback(async () => {
     setIsFetchingRecipes(true);
     const response = await fetch("/api/receitas", {
@@ -298,6 +303,7 @@ export default function AdminPage() {
             register={register}
             errors={errors}
             onSubmit={onSubmit}
+            availableTypes={availableTypes}
             // onRequestDelete={() => {
             //   if (selectedRecipe) {
             //     setPendingDelete(selectedRecipe.slug);

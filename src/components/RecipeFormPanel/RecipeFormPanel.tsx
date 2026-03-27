@@ -12,6 +12,7 @@ type RecipeFormPanelProps = {
   register: UseFormRegister<AdminFormValues>;
   errors: FieldErrors<AdminFormValues>;
   onSubmit: (event?: BaseSyntheticEvent) => Promise<void>;
+  availableTypes: string[];
   //onRequestDelete: () => void;
 };
 
@@ -23,6 +24,7 @@ export default function RecipeFormPanel({
   register,
   errors,
   onSubmit,
+  availableTypes,
   //onRequestDelete,
 }: RecipeFormPanelProps) {
   if (isLoadingRecipe) {
@@ -69,20 +71,30 @@ export default function RecipeFormPanel({
             <span className={styles.errorText}>{errors.resumo.message}</span>
           ) : null}
         </div>
-        <div className={styles.grid}>
-          <div className={styles.field}>
-            <label>Tipo</label>
+        <div className={styles.field}>
+          <label>Tipo</label>
+          <div className={styles.typeInputWrapper}>
             <input
               {...register("tipo", {
                 required: "Informe o tipo da receita.",
               })}
+              list="tipos-list"
+              placeholder="Selecione um tipo existente ou digite um novo"
+              className={styles.typeInput}
             />
-            {errors.tipo ? (
-              <span className={styles.errorText}>{errors.tipo.message}</span>
-            ) : null}
+            <datalist id="tipos-list">
+              {availableTypes.map((type) => (
+                <option key={type} value={type} />
+              ))}
+            </datalist>
           </div>
+          {errors.tipo ? (
+            <span className={styles.errorText}>{errors.tipo.message}</span>
+          ) : null}
+        </div>
+        <div className={styles.grid}>
           <div className={styles.field}>
-            <label>Tempo de preparo (em minutos)</label>
+            <label>Tempo de preparo (minutos)</label>
             <div className={styles.inputWithSuffix}>
               <input
                 type="number"
@@ -101,23 +113,23 @@ export default function RecipeFormPanel({
             ) : null}
           </div>
           <div className={styles.field}>
-            <label>Rendimento (porcoes)</label>
-            <div className={styles.inputWithSuffix}>
-              <input
-                type="number"
-                min={1}
-                step={1}
-                {...register("rendimento", {
-                  required: "Informe o rendimento.",
-                })}
-              />
-            </div>
+            <label>Rendimento (porções)</label>
+            <input
+              type="number"
+              min={1}
+              step={1}
+              {...register("rendimento", {
+                required: "Informe o rendimento.",
+              })}
+            />
             {errors.rendimento ? (
               <span className={styles.errorText}>
                 {errors.rendimento.message}
               </span>
             ) : null}
           </div>
+        </div>
+        <div className={styles.grid}>
           <div className={styles.field}>
             <label>Imagem (upload)</label>
             <input type="file" accept="image/*" {...register("fotoFile")} />

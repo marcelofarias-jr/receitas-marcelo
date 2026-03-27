@@ -8,6 +8,12 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 640px) {
+  .formPanel {
+    padding: 1.2rem;
+  }
+}
+
 .panelHeader {
   display: flex;
   flex-direction: column;
@@ -25,11 +31,14 @@
 }
 
 .form input,
-.form textarea {
+.form textarea,
+.form select {
+  width: 100%;
   padding: 0.7rem 0.9rem;
   border-radius: 10px;
   border: 1px solid var(--color-border);
   font: inherit;
+  box-sizing: border-box;
 }
 
 .form input[type="file"] {
@@ -45,8 +54,14 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .switches {
@@ -85,11 +100,38 @@
 .inputWithSuffix span {
   color: var(--color-muted);
   font-size: 0.9rem;
+  white-space: nowrap;
 }
 
 .errorText {
   color: #9c2c1f;
   font-size: 0.85rem;
+}
+
+.helpText {
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.typeInputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.typeInput {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.typeInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 255, 107, 107), 0.1);
 }
 
 .formSpinner {

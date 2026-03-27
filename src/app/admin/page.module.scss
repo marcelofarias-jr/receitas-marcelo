@@ -7,14 +7,15 @@
 }
 
 .layout {
-  width: min(100%, 1100px);
+  width: min(100%, 1400px);
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 280px 1fr;
   gap: 2rem;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 768px) {
   .layout {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
