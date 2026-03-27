@@ -14,13 +14,6 @@ Abra http://localhost:3000 no navegador.
 
 As imagens usam o mapeamento em [src/data/image-map.json](src/data/image-map.json).
 
-## Admin
-
-Acesse http://localhost:3000/admin e use:
-
-- Usuario: admin
-- Senha: admin
-
 ## Banco de dados (PostgreSQL + Drizzle)
 
 Configure o arquivo `.env.local` com:
