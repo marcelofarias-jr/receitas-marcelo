@@ -1,8 +1,8 @@
 [build]
-  # Se o package.json está em Receitas-do-marcelo/
-  base = "Receitas-do-marcelo"
+  # Build from repo root
+  base = "."
   command = "npm run build"
-  publish = "Receitas-do-marcelo/.next"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
@@ -11,3 +11,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
