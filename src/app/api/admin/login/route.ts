@@ -44,9 +44,11 @@ export async function POST(request: Request) {
       ok: true,
       message: "Login realizado com sucesso",
     });
-  } catch {
+  } catch (error) {
+    console.error("Login error:", error);
+    const message = error instanceof Error ? error.message : "Erro desconhecido";
     return NextResponse.json(
-      { error: "Erro interno do servidor" },
+      { error: `Erro interno do servidor: ${message}` },
       { status: 500 },
     );
   }
