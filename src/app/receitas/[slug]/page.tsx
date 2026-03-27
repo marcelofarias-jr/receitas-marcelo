@@ -27,7 +27,7 @@ export default async function RecipePage({ params }: PageProps) {
   const { slug } = await params;
   let recipe = await getRecipeBySlug(slug);
 
-  if (!recipe || recipe.delete) {
+  if (!recipe || recipe.deleted) {
     notFound();
   }
 

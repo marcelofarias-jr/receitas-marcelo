@@ -72,7 +72,7 @@ export default function AdminPage() {
     setIsFetchingRecipes(true);
     const response = await fetch("/api/receitas", { cache: "no-store" });
     const data = (await response.json()) as RecipesData;
-    setRecipes((data.receitas ?? []).filter((recipe) => !recipe.delete));
+    setRecipes((data.receitas ?? []).filter((recipe) => !recipe.deleted));
     setIsFetchingRecipes(false);
   }, []);
 

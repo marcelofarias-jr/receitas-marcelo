@@ -1,7 +1,7 @@
 export type Recipe = {
   id: number;
   slug: string;
-  delete: boolean;
+  deleted: boolean;
   foto: string;
   titulo: string;
   resumo: string;
@@ -31,10 +31,13 @@ export type RecipesData = {
   favoritos: Favorite[];
 };
 
-export type RecipeInput = Omit<Recipe, "id" | "slug" | "acessos" | "delete"> & {
+export type RecipeInput = Omit<
+  Recipe,
+  "id" | "slug" | "acessos" | "deleted"
+> & {
   slug?: string;
   acessos?: number;
-  delete?: boolean;
+  deleted?: boolean;
 };
 
 export type ImageMap = Record<string, string>;

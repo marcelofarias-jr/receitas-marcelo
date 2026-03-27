@@ -6,12 +6,22 @@ type Params = {
 };
 
 export async function POST(_: Request, { params }: Params) {
-  const { slug } = await params;
-  const updated = await incrementRecipeAccessBySlug(slug);
+  try {
+    const { slug } = await params;
+    const updated = await incrementRecipeAccessBySlug(slug);
 
-  if (!updated) {
-    return NextResponse.json({ message: "Nao encontrado" }, { status: 404 });
+    if (!updated) {
+      return NextResponse.json(
+        { error: "Receita não encontrada" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json({ acessos: updated.acessos });
+  } catch {
+    return NextResponse.json(
+      { error: "Erro ao incrementar acessos" },
+      { status: 500 },
+    );
   }
-
-  return NextResponse.json({ acessos: updated.acessos });
 }
