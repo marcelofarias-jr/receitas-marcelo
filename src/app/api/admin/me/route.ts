@@ -1,10 +1,7 @@
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextResponse, NextRequest } from "next/server";
+import { verifyAdminRequest } from "@/lib/auth-middleware";
 
-export async function GET() {
-  const store = await cookies();
-  const cookie = store.get("admin_session");
-  const ok = cookie?.value === "ok";
-
-  return NextResponse.json({ ok });
+export async function GET(request: NextRequest) {
+  const isAdmin = await verifyAdminRequest(request);
+  return NextResponse.json({ ok: isAdmin });
 }

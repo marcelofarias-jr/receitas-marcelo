@@ -70,7 +70,10 @@ export default function AdminPage() {
 
   const fetchRecipes = useCallback(async () => {
     setIsFetchingRecipes(true);
-    const response = await fetch("/api/receitas", { cache: "no-store" });
+    const response = await fetch("/api/receitas", {
+      cache: "no-store",
+      credentials: "include",
+    });
     const data = (await response.json()) as RecipesData;
     setRecipes((data.receitas ?? []).filter((recipe) => !recipe.deleted));
     setIsFetchingRecipes(false);
@@ -182,6 +185,7 @@ export default function AdminPage() {
     const response = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
@@ -199,6 +203,7 @@ export default function AdminPage() {
   const handleDeleteBySlug = async (slug: string) => {
     const response = await fetch(`/api/receitas/${slug}`, {
       method: "DELETE",
+      credentials: "include",
     });
 
     if (!response.ok) {
