@@ -2,23 +2,37 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
-import imageMap from "../data/image-map.json";
 import { useRecipesAccess } from "./state/recipes-context";
 import CategoryChip from "../components/CategoryChip/CategoryChip";
 import FeaturedItem from "../components/FeaturedItem/FeaturedItem";
 import HomeHero from "../components/HomeHero/HomeHero";
 import RecipeCard from "../components/RecipeCard/RecipeCard";
-import type { ImageMap, Recipe, RecipesData } from "../types/recipes";
+import type { Recipe, RecipesData } from "../types/recipes";
 
 const featuredCountFallback = 5;
 const allCategory = "Todas";
 
-function getImageUrl(recipe: Recipe) {
-  if (recipe.foto.startsWith("http") || recipe.foto.startsWith("/uploads/")) {
+function getImageUrl(recipe: Recipe): string {
+  // Só aceita URLs externas (http/https) ou paths locais em /uploads/
+  if (recipe.foto.startsWith("http://") || recipe.foto.startsWith("https://")) {
     return recipe.foto;
   }
 
-  return (imageMap as ImageMap)[recipe.foto] ?? "";
+  if (recipe.foto.startsWith("/uploads/")) {
+    return recipe.foto;
+  }
+
+  // Se for nome de arquivo sem path, tenta em /uploads/
+  if (
+    recipe.foto &&
+    !recipe.foto.includes("/") &&
+    !recipe.foto.includes("\\")
+  ) {
+    return `/uploads/${recipe.foto}`;
+  }
+
+  // Nenhuma imagem válida
+  return "";
 }
 
 export default function Home() {
