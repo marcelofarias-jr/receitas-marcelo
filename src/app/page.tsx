@@ -5,8 +5,10 @@ import styles from "./page.module.scss";
 import { useRecipesAccess } from "./state/recipes-context";
 import CategoryChip from "../components/CategoryChip/CategoryChip";
 import FeaturedItem from "../components/FeaturedItem/FeaturedItem";
+import FeaturedItemSkeleton from "../components/FeaturedItemSkeleton/FeaturedItemSkeleton";
 import HomeHero from "../components/HomeHero/HomeHero";
 import RecipeCard from "../components/RecipeCard/RecipeCard";
+import RecipeCardSkeleton from "../components/RecipeCardSkeleton/RecipeCardSkeleton";
 import type { Recipe, RecipesData } from "../types/recipes";
 
 const featuredCountFallback = 5;
@@ -39,12 +41,15 @@ export default function Home() {
   const { accessById } = useRecipesAccess();
   const [activeCategory, setActiveCategory] = useState(allCategory);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const run = async () => {
+      setLoading(true);
       const response = await fetch("/api/receitas", { cache: "no-store" });
       const data = (await response.json()) as RecipesData;
       setRecipes(data.receitas ?? []);
+      setLoading(false);
     };
 
     void run();
@@ -78,7 +83,11 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <HomeHero heroRecipe={heroRecipe ?? null} heroImage={heroImage} />
+        <HomeHero
+          heroRecipe={heroRecipe ?? null}
+          heroImage={heroImage}
+          loading={loading}
+        />
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
@@ -104,13 +113,17 @@ export default function Home() {
               <p>Da cozinha do Marcelo para o seu dia a dia.</p>
             </div>
             <div className={styles.cardGrid}>
-              {filteredRecipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  imageUrl={getImageUrl(recipe)}
-                />
-              ))}
+              {loading
+                ? Array.from({ length: 6 }).map((_, i) => (
+                    <RecipeCardSkeleton key={i} />
+                  ))
+                : filteredRecipes.map((recipe) => (
+                    <RecipeCard
+                      key={recipe.id}
+                      recipe={recipe}
+                      imageUrl={getImageUrl(recipe)}
+                    />
+                  ))}
             </div>
           </div>
           <aside className={styles.sidebar}>
@@ -119,13 +132,17 @@ export default function Home() {
               <p>As mais acessadas do momento.</p>
             </div>
             <div className={styles.featuredList}>
-              {featuredRecipes.map((recipe) => (
-                <FeaturedItem
-                  key={recipe.id}
-                  recipe={recipe}
-                  imageUrl={getImageUrl(recipe)}
-                />
-              ))}
+              {loading
+                ? Array.from({ length: 5 }).map((_, i) => (
+                    <FeaturedItemSkeleton key={i} />
+                  ))
+                : featuredRecipes.map((recipe) => (
+                    <FeaturedItem
+                      key={recipe.id}
+                      recipe={recipe}
+                      imageUrl={getImageUrl(recipe)}
+                    />
+                  ))}
             </div>
           </aside>
         </section>
