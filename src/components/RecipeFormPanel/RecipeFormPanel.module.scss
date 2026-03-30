@@ -43,7 +43,7 @@
 
 .form input[type="file"] {
   padding: 0.5rem 0.7rem;
-  background: #fffaf3;
+  background: var(--color-warm-tint);
 }
 
 .field {
@@ -85,7 +85,7 @@
   border-radius: 999px;
   border: none;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-white);
   font-weight: 600;
   cursor: pointer;
 }
@@ -104,7 +104,7 @@
 }
 
 .errorText {
-  color: #9c2c1f;
+  color: var(--color-error);
   font-size: 0.85rem;
 }
 
@@ -131,7 +131,7 @@
 .typeInput:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 255, 107, 107), 0.1);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
 }
 
 .imageSection {
@@ -146,7 +146,11 @@
   height: 150px;
   border-radius: var(--radius-md);
   overflow: hidden;
-  background: linear-gradient(135deg, #f6e8d9 0%, #eedcca 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-skeleton-from) 0%,
+    var(--color-skeleton-to) 100%
+  );
   border: 1px solid var(--color-border);
   flex-shrink: 0;
 }
@@ -155,7 +159,11 @@
   width: 200px;
   height: 150px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #f6e8d9 0%, #eedcca 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-skeleton-from) 0%,
+    var(--color-skeleton-to) 100%
+  );
   border: 1px dashed var(--color-border);
   display: flex;
   align-items: center;
@@ -175,7 +183,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 3px solid rgba(212, 74, 20, 0.2);
+  border: 3px solid var(--color-primary-fade);
   border-top-color: var(--color-primary);
   animation: spin 0.9s linear infinite;
 }
@@ -187,7 +195,7 @@
 }
 
 .danger {
-  background: #5b1a14;
+  background: var(--color-red);
 }
 
 .message {

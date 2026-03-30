@@ -1,7 +1,7 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(29, 23, 19, 0.45);
+  background: var(--color-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -29,12 +29,12 @@
   padding: 0.5rem 1rem;
   border-radius: 999px;
   border: 1px solid var(--color-border);
-  background: #fff;
+  background: var(--color-white);
   cursor: pointer;
 }
 
 .danger {
-  background: #5b1a14;
-  color: #fff;
-  border-color: #5b1a14;
+  background: var(--color-red);
+  color: var(--color-white);
+  border-color: var(--color-red);
 }

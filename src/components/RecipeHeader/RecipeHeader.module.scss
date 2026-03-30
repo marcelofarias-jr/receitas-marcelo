@@ -46,7 +46,11 @@
 
 .imagePlaceholder {
   height: 420px;
-  background: linear-gradient(120deg, #f6e8d9, #f0d7c1);
+  background: linear-gradient(
+    120deg,
+    var(--color-skeleton-from),
+    var(--color-placeholder-to)
+  );
 }
 
 @media (max-width: 1024px) {

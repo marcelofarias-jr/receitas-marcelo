@@ -31,7 +31,7 @@
   border-radius: 999px;
   border: none;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-white);
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -53,7 +53,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   border: 1px solid transparent;
-  background: #fffaf3;
+  background: var(--color-warm-tint);
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
 }
@@ -65,7 +65,7 @@
 
 .iconButton {
   border: 1px solid var(--color-border);
-  background: #fff;
+  background: var(--color-white);
   color: var(--color-ink);
   width: 32px;
   height: 32px;
@@ -82,8 +82,8 @@
 }
 
 .dangerButton {
-  border-color: #5b1a14;
-  color: #5b1a14;
+  border-color: var(--color-red);
+  color: var(--color-red);
 }
 
 .recipeItemActive {

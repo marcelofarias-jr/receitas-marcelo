@@ -21,7 +21,11 @@
 
 .cardImage {
   height: 200px;
-  background: linear-gradient(135deg, #f6e8d9 0%, #eedcca 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-skeleton-from) 0%,
+    var(--color-skeleton-to) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
