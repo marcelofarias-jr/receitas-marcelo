@@ -43,6 +43,7 @@ function parseNumber(value: string) {
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isFetchingRecipes, setIsFetchingRecipes] = useState(false);
   const [isLoadingRecipe, setIsLoadingRecipe] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -231,6 +232,20 @@ export default function AdminPage() {
     reset(emptyForm);
   };
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await fetch("/api/admin/login", {
+      method: "DELETE",
+      credentials: "include",
+    });
+    setAuthed(false);
+    setRecipes([]);
+    setSelectedSlug(null);
+    setActiveRecipe(null);
+    reset(emptyForm);
+    setIsLoggingOut(false);
+  };
+
   const handleEdit = (recipe: Recipe) => {
     setSelectedSlug(recipe.slug);
     setIsLoadingRecipe(true);
@@ -283,17 +298,24 @@ export default function AdminPage() {
       <ToastContainer />
       <div className={styles.page}>
         <main className={styles.layout}>
-          <RecipeListPanel
-            recipes={recipes}
-            selectedSlug={selectedSlug}
-            isFetchingRecipes={isFetchingRecipes}
-            isLoadingRecipe={isLoadingRecipe}
-            //styles={styles}
-            onNew={handleNew}
-            onEdit={handleEdit}
-            onRequestDelete={setPendingDelete}
-          />
-
+          <div className={styles.sidebar}>
+            <RecipeListPanel
+              recipes={recipes}
+              selectedSlug={selectedSlug}
+              isFetchingRecipes={isFetchingRecipes}
+              isLoadingRecipe={isLoadingRecipe}
+              onNew={handleNew}
+              onEdit={handleEdit}
+              onRequestDelete={setPendingDelete}
+            />
+            <button
+              className={styles.logoutButton}
+              onClick={() => void handleLogout()}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? "Saindo..." : "Sair"}
+            </button>
+          </div>
           <RecipeFormPanel
             selectedRecipe={selectedRecipe}
             isLoadingRecipe={isLoadingRecipe}

@@ -16,7 +16,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const isValid = await validateAdminCredentials(username, password);
+    const normalizedUsername = username.trim().toLowerCase();
+    const isValid = await validateAdminCredentials(
+      normalizedUsername,
+      password,
+    );
 
     if (!isValid) {
       return NextResponse.json(
@@ -25,7 +29,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const token = generateAdminToken(username);
+    const token = generateAdminToken(normalizedUsername);
 
     const store = await cookies();
     store.set("admin_token", token, {
@@ -49,4 +53,16 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+}
+
+export async function DELETE() {
+  const store = await cookies();
+  store.set("admin_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
+  return NextResponse.json({ ok: true });
 }
