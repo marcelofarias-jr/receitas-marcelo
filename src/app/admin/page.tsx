@@ -208,9 +208,31 @@ export default function AdminPage() {
       return;
     }
 
+    const savedRecipe = (await response.json()) as Recipe;
     await fetchRecipes();
-    setSelectedSlug(null);
-    reset(emptyForm);
+
+    if (isEdit) {
+      setSelectedSlug(savedRecipe.slug);
+      setActiveRecipe(savedRecipe);
+      reset({
+        titulo: savedRecipe.titulo,
+        resumo: savedRecipe.resumo,
+        tipo: savedRecipe.tipo,
+        tempoDePreparo: parseNumber(savedRecipe.tempoDePreparo),
+        rendimento: parseNumber(savedRecipe.rendimento),
+        fotoUrl: savedRecipe.foto.startsWith("/uploads/")
+          ? ""
+          : savedRecipe.foto,
+        culinariaText: toLineText(savedRecipe["culinária"]),
+        ingredientesText: toLineText(savedRecipe.igredientes),
+        preparoText: toLineText(savedRecipe.preparo),
+        vegano: savedRecipe.vegano,
+      });
+    } else {
+      setSelectedSlug(null);
+      setActiveRecipe(null);
+      reset(emptyForm);
+    }
     toast.success("Receita salva com sucesso.");
   });
 
