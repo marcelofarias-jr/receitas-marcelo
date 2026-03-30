@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
+import {
+  verifyAdminRequest,
+  unauthorizedResponse,
+} from "@/lib/auth-middleware";
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 const uploadDir = path.join(process.cwd(), "public", "uploads");
@@ -28,7 +33,14 @@ function getExtension(mimeType: string, fallbackName: string) {
   return ext || "jpg";
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const isAdmin = await verifyAdminRequest(request);
+  if (!isAdmin) {
+    return unauthorizedResponse(
+      "Apenas administradores podem fazer upload de imagens.",
+    );
+  }
+
   const formData = await request.formData();
   const file = formData.get("file");
 
