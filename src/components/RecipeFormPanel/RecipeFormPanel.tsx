@@ -1,5 +1,6 @@
-import type { BaseSyntheticEvent } from "react";
+import { type BaseSyntheticEvent, useEffect, useRef, useState } from "react";
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import Image from "next/image";
 import styles from "./RecipeFormPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
 import type { AdminFormValues } from "../../types/admin";
@@ -27,6 +28,21 @@ export default function RecipeFormPanel({
   availableTypes,
   //onRequestDelete,
 }: RecipeFormPanelProps) {
+  const [previewUrl, setPreviewUrl] = useState<string>(
+    selectedRecipe?.foto ?? "",
+  );
+  const objectUrlRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+    setPreviewUrl(selectedRecipe?.foto ?? "");
+  }, [selectedRecipe]);
+
+  const fotoFileProps = register("fotoFile");
+  const fotoUrlProps = register("fotoUrl");
   if (isLoadingRecipe) {
     return (
       <section className={styles.formPanel}>
@@ -129,14 +145,58 @@ export default function RecipeFormPanel({
             ) : null}
           </div>
         </div>
-        <div className={styles.grid}>
-          <div className={styles.field}>
-            <label>Imagem (upload)</label>
-            <input type="file" accept="image/*" {...register("fotoFile")} />
-          </div>
-          <div className={styles.field}>
-            <label>Imagem (URL)</label>
-            <input placeholder="https://" {...register("fotoUrl")} />
+        <div className={styles.imageSection}>
+          {previewUrl ? (
+            <div className={styles.imagePreview}>
+              <Image
+                src={previewUrl}
+                alt="Pré-visualização"
+                fill
+                sizes="340px"
+                style={{ objectFit: "cover" }}
+                unoptimized={previewUrl.startsWith("blob:")}
+              />
+            </div>
+          ) : (
+            <div className={styles.imagePreviewPlaceholder}>
+              <span>Sem imagem</span>
+            </div>
+          )}
+          <div className={styles.grid}>
+            <div className={styles.field}>
+              <label>Imagem (upload)</label>
+              <input
+                type="file"
+                accept="image/*"
+                {...fotoFileProps}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (objectUrlRef.current) {
+                      URL.revokeObjectURL(objectUrlRef.current);
+                    }
+                    const url = URL.createObjectURL(file);
+                    objectUrlRef.current = url;
+                    setPreviewUrl(url);
+                  }
+                  void fotoFileProps.onChange(e);
+                }}
+              />
+            </div>
+            <div className={styles.field}>
+              <label>Imagem (URL)</label>
+              <input
+                placeholder="https://"
+                {...fotoUrlProps}
+                onChange={(e) => {
+                  const val = e.target.value.trim();
+                  if (val && !objectUrlRef.current) {
+                    setPreviewUrl(val);
+                  }
+                  void fotoUrlProps.onChange(e);
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className={styles.field}>

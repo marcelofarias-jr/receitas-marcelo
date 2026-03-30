@@ -134,6 +134,37 @@
   box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 255, 107, 107), 0.1);
 }
 
+.imageSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.imagePreview {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: linear-gradient(135deg, #f6e8d9 0%, #eedcca 100%);
+  border: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.imagePreviewPlaceholder {
+  width: 200px;
+  height: 150px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #f6e8d9 0%, #eedcca 100%);
+  border: 1px dashed var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
 .formSpinner {
   min-height: 480px;
   display: grid;
