@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+export const dynamic = "force-dynamic";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { useRecipesAccess } from "./state/recipes-context";
 import CategoryChip from "../components/CategoryChip/CategoryChip";
@@ -43,16 +45,28 @@ export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const run = async () => {
-      setLoading(true);
-      const response = await fetch("/api/receitas", { cache: "no-store" });
-      const data = (await response.json()) as RecipesData;
-      setRecipes(data.receitas ?? []);
-      setLoading(false);
-    };
+  const fetchRecipes = () => {
+    setLoading(true);
+    fetch("/api/receitas", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data: RecipesData) => {
+        setRecipes(data.receitas ?? []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
 
-    void run();
+  const fetchRecipesRef = useRef(fetchRecipes);
+  fetchRecipesRef.current = fetchRecipes;
+
+  useEffect(() => {
+    fetchRecipesRef.current();
+  }, []);
+
+  useEffect(() => {
+    const eventSource = new EventSource("/api/updates");
+    eventSource.onmessage = () => fetchRecipesRef.current();
+    return () => eventSource.close();
   }, []);
 
   const featuredCount = featuredCountFallback;

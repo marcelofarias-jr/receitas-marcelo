@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import styles from "./page.module.scss";
+
+export const dynamic = "force-dynamic";
+
 import RecipeHeader from "../../../components/RecipeHeader/RecipeHeader";
 import RecipeIngredients from "../../../components/RecipeIngredients/RecipeIngredients";
 import RecipeSteps from "../../../components/RecipeSteps/RecipeSteps";
+import RecipeRefresher from "../../../components/RecipeRefresher/RecipeRefresher";
 import {
   getRecipeBySlug,
   incrementRecipeAccessBySlug,
@@ -54,6 +58,7 @@ export default async function RecipePage({ params }: PageProps) {
 
   return (
     <div className={styles.page}>
+      <RecipeRefresher />
       <main className={styles.main}>
         <Link href="/" className={styles.backLink}>
           Voltar para as receitas

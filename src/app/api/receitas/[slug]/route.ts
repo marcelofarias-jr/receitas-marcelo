@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { revalidateTag, revalidatePath, cacheTag, cacheLife } from "next/cache";
 import {
   getRecipeBySlug,
   softDeleteRecipe,
@@ -10,22 +9,16 @@ import {
   verifyAdminRequest,
   unauthorizedResponse,
 } from "@/lib/auth-middleware";
+import { broadcastUpdate } from "@/lib/updates-broadcaster";
 
 type Params = {
   params: Promise<{ slug: string }>;
 };
 
-async function fetchRecipeData(slug: string) {
-  "use cache";
-  cacheTag("recipes", `recipe-${slug}`);
-  cacheLife("hours");
-  return getRecipeBySlug(slug);
-}
-
 export async function GET(_: Request, { params }: Params) {
   try {
     const { slug } = await params;
-    const recipe = await fetchRecipeData(slug);
+    const recipe = await getRecipeBySlug(slug);
 
     if (!recipe || recipe.deleted) {
       return NextResponse.json(
@@ -65,13 +58,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
       );
     }
 
-    revalidateTag("recipes", "default");
-    revalidateTag(`recipe-${slug}`, "default");
-    if (updated.slug !== slug) {
-      revalidatePath(`/receitas/${slug}`, "page");
-    }
-    revalidatePath(`/receitas/${updated.slug}`, "page");
-    revalidatePath("/", "page");
+    broadcastUpdate();
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json(
@@ -102,10 +89,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       );
     }
 
-    revalidateTag("recipes", "default");
-    revalidateTag(`recipe-${slug}`, "default");
-    revalidatePath(`/receitas/${slug}`, "page");
-    revalidatePath("/", "page");
+    broadcastUpdate();
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json(

@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   experimental: {
-    cacheComponents: true,
+    staleTimes: {
+      dynamic: 0,
+    },
   },
   turbopack: {
     root: __dirname,
