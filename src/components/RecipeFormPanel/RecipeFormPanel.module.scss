@@ -108,6 +108,12 @@
   font-size: 0.85rem;
 }
 
+.currentFile {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  word-break: break-all;
+}
+
 .helpText {
   color: var(--color-muted);
   font-size: 0.8rem;

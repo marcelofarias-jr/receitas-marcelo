@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import { revalidateTag, cacheTag, cacheLife } from "next/cache";
 import { createRecipe, listRecipes } from "@/lib/recipes-repo";
 import type { RecipeInput, RecipesData } from "@/types/recipes";
 import {
@@ -6,9 +7,16 @@ import {
   unauthorizedResponse,
 } from "@/lib/auth-middleware";
 
+async function fetchRecipesData() {
+  "use cache";
+  cacheTag("recipes");
+  cacheLife("hours");
+  return listRecipes(false);
+}
+
 export async function GET() {
   try {
-    const receitas = await listRecipes(false);
+    const receitas = await fetchRecipesData();
     const payload: RecipesData = {
       receitas,
       categorias: [],
@@ -35,6 +43,7 @@ export async function POST(request: NextRequest) {
 
     const payload = (await request.json()) as RecipeInput;
     const recipe = await createRecipe(payload);
+    revalidateTag("recipes", "default");
     return NextResponse.json(recipe, { status: 201 });
   } catch {
     return NextResponse.json(

@@ -58,6 +58,7 @@ export default function AdminPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<AdminFormValues>({
     defaultValues: emptyForm,
@@ -106,7 +107,7 @@ export default function AdminPage() {
         tipo: activeRecipe.tipo,
         tempoDePreparo: parseNumber(activeRecipe.tempoDePreparo),
         rendimento: parseNumber(activeRecipe.rendimento),
-        fotoUrl: activeRecipe.foto,
+        fotoUrl: activeRecipe.foto.startsWith("/uploads/") ? "" : activeRecipe.foto,
         culinariaText: toLineText(activeRecipe["culinária"]),
         ingredientesText: toLineText(activeRecipe.igredientes),
         preparoText: toLineText(activeRecipe.preparo),
@@ -151,6 +152,7 @@ export default function AdminPage() {
       const uploadResponse = await fetch("/api/uploads", {
         method: "POST",
         body: formData,
+        credentials: "include",
       });
 
       if (!uploadResponse.ok) {
@@ -164,8 +166,12 @@ export default function AdminPage() {
       setIsUploadingImage(false);
     }
 
+    if (!foto && selectedRecipe?.foto) {
+      foto = selectedRecipe.foto;
+    }
+
     if (!foto) {
-      toast.error("Informe uma imagem (upload ou URL). ");
+      toast.error("Informe uma imagem (upload ou URL).");
       return;
     }
 
@@ -263,7 +269,7 @@ export default function AdminPage() {
       tipo: nextRecipe.tipo,
       tempoDePreparo: parseNumber(nextRecipe.tempoDePreparo),
       rendimento: parseNumber(nextRecipe.rendimento),
-      fotoUrl: nextRecipe.foto,
+      fotoUrl: nextRecipe.foto.startsWith("/uploads/") ? "" : nextRecipe.foto,
       culinariaText: toLineText(nextRecipe["culinária"]),
       ingredientesText: toLineText(nextRecipe.igredientes),
       preparoText: toLineText(nextRecipe.preparo),
@@ -321,8 +327,8 @@ export default function AdminPage() {
             isLoadingRecipe={isLoadingRecipe}
             isSubmitting={isSubmitting}
             isUploadingImage={isUploadingImage}
-            //styles={styles}
             register={register}
+            setValue={setValue}
             errors={errors}
             onSubmit={onSubmit}
             availableTypes={availableTypes}

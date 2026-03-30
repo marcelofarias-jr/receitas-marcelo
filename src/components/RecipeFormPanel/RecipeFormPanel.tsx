@@ -1,5 +1,5 @@
 import { type BaseSyntheticEvent, useEffect, useRef, useState } from "react";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import Image from "next/image";
 import styles from "./RecipeFormPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
@@ -11,10 +11,10 @@ type RecipeFormPanelProps = {
   isSubmitting: boolean;
   isUploadingImage: boolean;
   register: UseFormRegister<AdminFormValues>;
+  setValue: UseFormSetValue<AdminFormValues>;
   errors: FieldErrors<AdminFormValues>;
   onSubmit: (event?: BaseSyntheticEvent) => Promise<void>;
   availableTypes: string[];
-  //onRequestDelete: () => void;
 };
 
 export default function RecipeFormPanel({
@@ -23,15 +23,16 @@ export default function RecipeFormPanel({
   isSubmitting,
   isUploadingImage,
   register,
+  setValue,
   errors,
   onSubmit,
   availableTypes,
-  //onRequestDelete,
 }: RecipeFormPanelProps) {
   const [previewUrl, setPreviewUrl] = useState<string>(
     selectedRecipe?.foto ?? "",
   );
   const objectUrlRef = useRef<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (objectUrlRef.current) {
@@ -40,6 +41,11 @@ export default function RecipeFormPanel({
     }
     setPreviewUrl(selectedRecipe?.foto ?? "");
   }, [selectedRecipe]);
+
+  const currentUploadName =
+    selectedRecipe?.foto?.startsWith("/uploads/")
+      ? selectedRecipe.foto.split("/").pop()
+      : null;
 
   const fotoFileProps = register("fotoFile");
   const fotoUrlProps = register("fotoUrl");
@@ -169,6 +175,10 @@ export default function RecipeFormPanel({
                 type="file"
                 accept="image/*"
                 {...fotoFileProps}
+                ref={(el) => {
+                  fotoFileProps.ref(el);
+                  fileInputRef.current = el;
+                }}
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
@@ -178,10 +188,14 @@ export default function RecipeFormPanel({
                     const url = URL.createObjectURL(file);
                     objectUrlRef.current = url;
                     setPreviewUrl(url);
+                    setValue("fotoUrl", "");
                   }
                   void fotoFileProps.onChange(e);
                 }}
               />
+              {currentUploadName ? (
+                <span className={styles.currentFile}>Atual: {currentUploadName}</span>
+              ) : null}
             </div>
             <div className={styles.field}>
               <label>Imagem (URL)</label>
@@ -190,7 +204,14 @@ export default function RecipeFormPanel({
                 {...fotoUrlProps}
                 onChange={(e) => {
                   const val = e.target.value.trim();
-                  if (val && !objectUrlRef.current) {
+                  if (val) {
+                    if (objectUrlRef.current) {
+                      URL.revokeObjectURL(objectUrlRef.current);
+                      objectUrlRef.current = null;
+                    }
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = "";
+                    }
                     setPreviewUrl(val);
                   }
                   void fotoUrlProps.onChange(e);
