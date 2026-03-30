@@ -8,7 +8,6 @@ import {
 
 export async function GET() {
   try {
-    // GET é público - qualquer um pode listar receitas
     const receitas = await listRecipes(false);
     const payload: RecipesData = {
       receitas,
@@ -26,7 +25,6 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verificar autenticação de admin
     const isAdmin = await verifyAdminRequest(request);
 
     if (!isAdmin) {

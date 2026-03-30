@@ -16,28 +16,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validar credenciais contra variáveis de ambiente
     const isValid = await validateAdminCredentials(username, password);
 
     if (!isValid) {
-      // Rate limiting no frontend é recomendado também
       return NextResponse.json(
         { error: "Credenciais inválidas" },
         { status: 401 },
       );
     }
 
-    // Gerar JWT token
     const token = generateAdminToken(username);
 
-    // Salvar token no cookie httpOnly
     const store = await cookies();
     store.set("admin_token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // HTTPS only em produção
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 12, // 12 horas
+      maxAge: 60 * 60 * 12,
     });
 
     return NextResponse.json({
