@@ -107,7 +107,9 @@ export default function AdminPage() {
         tipo: activeRecipe.tipo,
         tempoDePreparo: parseNumber(activeRecipe.tempoDePreparo),
         rendimento: parseNumber(activeRecipe.rendimento),
-        fotoUrl: activeRecipe.foto.startsWith("/uploads/") ? "" : activeRecipe.foto,
+        fotoUrl: activeRecipe.foto.startsWith("/uploads/")
+          ? ""
+          : activeRecipe.foto,
         culinariaText: toLineText(activeRecipe["culinária"]),
         ingredientesText: toLineText(activeRecipe.igredientes),
         preparoText: toLineText(activeRecipe.preparo),

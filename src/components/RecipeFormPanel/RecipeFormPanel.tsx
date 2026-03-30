@@ -1,5 +1,9 @@
 import { type BaseSyntheticEvent, useEffect, useRef, useState } from "react";
-import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import type {
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetValue,
+} from "react-hook-form";
 import Image from "next/image";
 import styles from "./RecipeFormPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
@@ -42,10 +46,9 @@ export default function RecipeFormPanel({
     setPreviewUrl(selectedRecipe?.foto ?? "");
   }, [selectedRecipe]);
 
-  const currentUploadName =
-    selectedRecipe?.foto?.startsWith("/uploads/")
-      ? selectedRecipe.foto.split("/").pop()
-      : null;
+  const currentUploadName = selectedRecipe?.foto?.startsWith("/uploads/")
+    ? selectedRecipe.foto.split("/").pop()
+    : null;
 
   const fotoFileProps = register("fotoFile");
   const fotoUrlProps = register("fotoUrl");
@@ -194,7 +197,9 @@ export default function RecipeFormPanel({
                 }}
               />
               {currentUploadName ? (
-                <span className={styles.currentFile}>Atual: {currentUploadName}</span>
+                <span className={styles.currentFile}>
+                  Atual: {currentUploadName}
+                </span>
               ) : null}
             </div>
             <div className={styles.field}>
