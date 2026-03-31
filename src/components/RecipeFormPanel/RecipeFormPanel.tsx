@@ -43,6 +43,9 @@ export default function RecipeFormPanel({
       URL.revokeObjectURL(objectUrlRef.current);
       objectUrlRef.current = null;
     }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     setPreviewUrl(selectedRecipe?.foto ?? "");
   }, [selectedRecipe]);
 

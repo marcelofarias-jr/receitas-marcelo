@@ -69,8 +69,53 @@ Resposta:
 
 Se retornar `{"ok":false}`, significa que não está autenticado.
 
+## Upload de Imagens (Produção)
+
+O upload de imagens usa o **Supabase Storage**. Para funcionar em produção (Vercel), você precisa:
+
+### 1. Criar o bucket no Supabase
+
+1. Acesse o [Dashboard do Supabase](https://supabase.com/dashboard)
+2. Vá em **Storage** → **New bucket**
+3. Nome: `uploads`
+4. Marque **Public bucket** (necessário para servir as imagens)
+5. Clique em **Create bucket**
+
+### 2. Configurar política de upload
+
+No bucket `uploads`, vá em **Policies** → **New policy** e crie:
+
+- **Nome**: `allow-admin-insert`
+- **Operação**: INSERT
+- **Expressão**: `true`
+
+> Isso permite que a rota de API (que já verificou o admin via JWT) faça uploads. O bucket é público apenas para leitura.
+
+### 3. Obter a Service Role Key
+
+1. No Dashboard do Supabase, vá em **Project Settings** → **API**
+2. Copie a **service_role key** (seção "Project API keys")
+
+### 4. Adicionar às variáveis de ambiente
+
+**No `.env.local` (desenvolvimento):**
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=eyJ... (cole a service_role key)
+```
+
+**No Vercel (produção):**
+
+1. Acesse o painel do seu projeto no Vercel
+2. Vá em **Settings** → **Environment Variables**
+3. Adicione: `SUPABASE_SERVICE_ROLE_KEY` com o valor da service_role key
+
+> A service*role key é um segredo — **nunca** a adicione a variáveis com prefixo `NEXT_PUBLIC*`.
+
+---
+
 ## Avisos
 
 ⚠️ **JWT_SECRET deve ter pelo menos 32 caracteres** para máxima segurança.
 
-⚠️ **Nunca compartilhe seu ADMIN_PASSWORD_HASH ou JWT_SECRET** - mantenha em local seguro.
+⚠️ **Nunca compartilhe seu ADMIN_PASSWORD_HASH, JWT_SECRET ou SUPABASE_SERVICE_ROLE_KEY** - mantenha em local seguro.
