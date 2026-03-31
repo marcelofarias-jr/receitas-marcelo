@@ -6,7 +6,7 @@ type RecipeListPanelProps = {
   recipes: Recipe[];
   selectedSlug: string | null;
   isFetchingRecipes: boolean;
-  isLoadingRecipe: boolean;
+  isSubmitting: boolean;
   onNew: () => void;
   onEdit: (recipe: Recipe) => void;
   onRequestDelete: (slug: string) => void;
@@ -16,7 +16,7 @@ export default function RecipeListPanel({
   recipes,
   selectedSlug,
   isFetchingRecipes,
-  isLoadingRecipe,
+  isSubmitting,
   onNew,
   onEdit,
   onRequestDelete,
@@ -54,7 +54,7 @@ export default function RecipeListPanel({
                 onClick={() => onEdit(recipe)}
                 aria-label="Editar receita"
                 title="Editar receita"
-                disabled={isLoadingRecipe}
+                disabled={isSubmitting}
               >
                 <Pencil size={16} aria-hidden="true" />
               </button>
@@ -64,7 +64,7 @@ export default function RecipeListPanel({
                 onClick={() => onRequestDelete(recipe.slug)}
                 aria-label="Excluir receita"
                 title="Excluir receita"
-                disabled={isLoadingRecipe}
+                disabled={isSubmitting}
               >
                 <Trash2 size={16} aria-hidden="true" />
               </button>

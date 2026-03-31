@@ -18,6 +18,7 @@ const emptyForm: AdminFormValues = {
   tempoDePreparo: "",
   rendimento: "",
   fotoUrl: "",
+  fotoFile: undefined,
   culinariaText: "",
   ingredientesText: "",
   preparoText: "",
@@ -45,24 +46,24 @@ export default function AdminPage() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isFetchingRecipes, setIsFetchingRecipes] = useState(false);
-  const [isLoadingRecipe, setIsLoadingRecipe] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [activeRecipe, setActiveRecipe] = useState<Recipe | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  //const [message, setMessage] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<AdminFormValues>({
     defaultValues: emptyForm,
-    mode: "onBlur",
+    mode: "onChange",
   });
 
   const selectedRecipe = useMemo(
@@ -86,6 +87,31 @@ export default function AdminPage() {
     setIsFetchingRecipes(false);
   }, []);
 
+  // Efeito para resetar o formulário quando a receita selecionada muda
+  useEffect(() => {
+    if (selectedRecipe) {
+      // Reset com os valores da receita selecionada
+      reset({
+        titulo: selectedRecipe.titulo,
+        resumo: selectedRecipe.resumo,
+        tipo: selectedRecipe.tipo,
+        tempoDePreparo: parseNumber(selectedRecipe.tempoDePreparo),
+        rendimento: parseNumber(selectedRecipe.rendimento),
+        fotoUrl: selectedRecipe.foto.startsWith("/uploads/")
+          ? ""
+          : selectedRecipe.foto,
+        fotoFile: undefined,
+        culinariaText: toLineText(selectedRecipe["culinária"]),
+        ingredientesText: toLineText(selectedRecipe.igredientes),
+        preparoText: toLineText(selectedRecipe.preparo),
+        vegano: selectedRecipe.vegano,
+      });
+    } else {
+      // Reset para formulário vazio
+      reset(emptyForm);
+    }
+  }, [selectedRecipe, reset]);
+
   useEffect(() => {
     const run = async () => {
       const response = await fetch("/api/admin/me", { cache: "no-store" });
@@ -98,28 +124,6 @@ export default function AdminPage() {
 
     void run();
   }, [fetchRecipes]);
-
-  useEffect(() => {
-    if (activeRecipe) {
-      reset({
-        titulo: activeRecipe.titulo,
-        resumo: activeRecipe.resumo,
-        tipo: activeRecipe.tipo,
-        tempoDePreparo: parseNumber(activeRecipe.tempoDePreparo),
-        rendimento: parseNumber(activeRecipe.rendimento),
-        fotoUrl: activeRecipe.foto.startsWith("/uploads/")
-          ? ""
-          : activeRecipe.foto,
-        culinariaText: toLineText(activeRecipe["culinária"]),
-        ingredientesText: toLineText(activeRecipe.igredientes),
-        preparoText: toLineText(activeRecipe.preparo),
-        vegano: activeRecipe.vegano,
-      });
-      return;
-    }
-
-    reset(emptyForm);
-  }, [activeRecipe, reset]);
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -143,6 +147,8 @@ export default function AdminPage() {
   };
 
   const onSubmit = handleSubmit(async (values) => {
+    console.log("Valores do formulário ao salvar:", values); // Debug
+
     let foto = values.fotoUrl.trim();
     const file = values.fotoFile?.[0];
 
@@ -212,25 +218,11 @@ export default function AdminPage() {
     await fetchRecipes();
 
     if (isEdit) {
+      // Atualiza a receita selecionada com os novos dados
       setSelectedSlug(savedRecipe.slug);
-      setActiveRecipe(savedRecipe);
-      reset({
-        titulo: savedRecipe.titulo,
-        resumo: savedRecipe.resumo,
-        tipo: savedRecipe.tipo,
-        tempoDePreparo: parseNumber(savedRecipe.tempoDePreparo),
-        rendimento: parseNumber(savedRecipe.rendimento),
-        fotoUrl: savedRecipe.foto.startsWith("/uploads/")
-          ? ""
-          : savedRecipe.foto,
-        culinariaText: toLineText(savedRecipe["culinária"]),
-        ingredientesText: toLineText(savedRecipe.igredientes),
-        preparoText: toLineText(savedRecipe.preparo),
-        vegano: savedRecipe.vegano,
-      });
+      // O useEffect vai resetar o formulário com os novos valores
     } else {
       setSelectedSlug(null);
-      setActiveRecipe(null);
       reset(emptyForm);
     }
     toast.success("Receita salva com sucesso.");
@@ -256,10 +248,8 @@ export default function AdminPage() {
   };
 
   const handleNew = () => {
-    reset();
     setSelectedSlug(null);
-    setActiveRecipe(null);
-    reset(emptyForm);
+    // O useEffect vai resetar para emptyForm automaticamente
   };
 
   const handleLogout = async () => {
@@ -271,40 +261,13 @@ export default function AdminPage() {
     setAuthed(false);
     setRecipes([]);
     setSelectedSlug(null);
-    setActiveRecipe(null);
     reset(emptyForm);
     setIsLoggingOut(false);
   };
 
   const handleEdit = (recipe: Recipe) => {
     setSelectedSlug(recipe.slug);
-    setIsLoadingRecipe(true);
-
-    const nextRecipe: Recipe = {
-      ...recipe,
-      igredientes: [...recipe.igredientes],
-      preparo: [...recipe.preparo],
-      culinária: [...recipe["culinária"]],
-    };
-
-    reset({
-      titulo: nextRecipe.titulo,
-      resumo: nextRecipe.resumo,
-      tipo: nextRecipe.tipo,
-      tempoDePreparo: parseNumber(nextRecipe.tempoDePreparo),
-      rendimento: parseNumber(nextRecipe.rendimento),
-      fotoUrl: nextRecipe.foto.startsWith("/uploads/") ? "" : nextRecipe.foto,
-      culinariaText: toLineText(nextRecipe["culinária"]),
-      ingredientesText: toLineText(nextRecipe.igredientes),
-      preparoText: toLineText(nextRecipe.preparo),
-      vegano: nextRecipe.vegano,
-    });
-
-    setActiveRecipe(nextRecipe);
-
-    window.setTimeout(() => {
-      setIsLoadingRecipe(false);
-    }, 150);
+    // O useEffect vai resetar o formulário com os valores da receita
   };
 
   if (!authed) {
@@ -314,7 +277,6 @@ export default function AdminPage() {
           username={username}
           password={password}
           isLoggingIn={isLoggingIn}
-          //styles={styles}
           onUsernameChange={setUsername}
           onPasswordChange={setPassword}
           onSubmit={handleLogin}
@@ -333,7 +295,7 @@ export default function AdminPage() {
               recipes={recipes}
               selectedSlug={selectedSlug}
               isFetchingRecipes={isFetchingRecipes}
-              isLoadingRecipe={isLoadingRecipe}
+              isSubmitting={isSubmitting}
               onNew={handleNew}
               onEdit={handleEdit}
               onRequestDelete={setPendingDelete}
@@ -347,26 +309,22 @@ export default function AdminPage() {
             </button>
           </div>
           <RecipeFormPanel
+            key={selectedSlug ?? "new"}
             selectedRecipe={selectedRecipe}
-            isLoadingRecipe={isLoadingRecipe}
             isSubmitting={isSubmitting}
             isUploadingImage={isUploadingImage}
             register={register}
             setValue={setValue}
+            watch={watch}
+            control={control}
             errors={errors}
             onSubmit={onSubmit}
             availableTypes={availableTypes}
-            // onRequestDelete={() => {
-            //   if (selectedRecipe) {
-            //     setPendingDelete(selectedRecipe.slug);
-            //   }
-            // }}
           />
         </main>
         <DeleteModal
           isOpen={Boolean(pendingDelete)}
           isSubmitting={isSubmitting}
-          //styles={styles}
           onCancel={() => setPendingDelete(null)}
           onConfirm={() => {
             if (pendingDelete) {

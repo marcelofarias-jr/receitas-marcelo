@@ -88,6 +88,12 @@
   color: var(--color-white);
   font-weight: 600;
   cursor: pointer;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #cccccc;
+    pointer-events: none;
+  }
 }
 
 .inputWithSuffix {
