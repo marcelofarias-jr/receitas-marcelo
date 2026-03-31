@@ -1,48 +1,44 @@
-import {
-  type BaseSyntheticEvent,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
-import {
-  Controller,
-  type FieldErrors,
-  type UseFormRegister,
-  type UseFormSetValue,
-  type UseFormWatch,
-  type Control,
-} from "react-hook-form";
+"use client";
+
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useFormContext } from "react-hook-form";
 import Image from "next/image";
 import styles from "./RecipeFormPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
-import type { AdminFormValues } from "../../types/admin";
+import type { RecipeFormValues } from "../../schemas/recipe.schema";
 
 interface RecipeFormPanelProps {
   selectedRecipe: Recipe | null;
   isSubmitting: boolean;
   isUploadingImage: boolean;
-  register: UseFormRegister<AdminFormValues>;
-  setValue: UseFormSetValue<AdminFormValues>;
-  watch: UseFormWatch<AdminFormValues>;
-  errors: FieldErrors<AdminFormValues>;
-  onSubmit: (event?: BaseSyntheticEvent) => Promise<void>;
+  onSubmit: (event?: React.BaseSyntheticEvent) => Promise<void>;
   availableTypes: string[];
-  control: Control<AdminFormValues>;
 }
+
+// Helper function for safe object URL revocation
+const revokeObjectUrlSafe = (
+  urlRef: React.MutableRefObject<string | null>,
+): void => {
+  if (urlRef.current) {
+    URL.revokeObjectURL(urlRef.current);
+    urlRef.current = null;
+  }
+};
 
 export default function RecipeFormPanel({
   selectedRecipe,
   isSubmitting,
   isUploadingImage,
-  register,
-  setValue,
-  watch,
-  errors,
   onSubmit,
   availableTypes,
-  control,
 }: RecipeFormPanelProps) {
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext<RecipeFormValues>();
+
   const fotoUrl = watch("fotoUrl");
   const fotoFile = watch("fotoFile");
 
@@ -50,112 +46,93 @@ export default function RecipeFormPanel({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
 
-  // Função para limpar URL de objeto
-  const revokeObjectUrl = useCallback(() => {
-    if (objectUrlRef.current) {
-      URL.revokeObjectURL(objectUrlRef.current);
-      objectUrlRef.current = null;
-    }
+  // Cleanup function
+  const cleanupObjectUrl = useCallback((): void => {
+    revokeObjectUrlSafe(objectUrlRef);
   }, []);
 
-  // Função para atualizar preview a partir de um arquivo
+  // Update preview from file
   const updatePreviewFromFile = useCallback(
-    (file: File) => {
-      revokeObjectUrl();
+    (file: File): void => {
+      cleanupObjectUrl();
       const url = URL.createObjectURL(file);
       objectUrlRef.current = url;
       setPreviewUrl(url);
     },
-    [revokeObjectUrl],
+    [cleanupObjectUrl],
   );
 
-  // Função para atualizar preview a partir de uma URL
+  // Update preview from URL string
   const updatePreviewFromUrl = useCallback(
-    (url: string) => {
-      revokeObjectUrl();
+    (url: string): void => {
+      cleanupObjectUrl();
       setPreviewUrl(url);
     },
-    [revokeObjectUrl],
+    [cleanupObjectUrl],
   );
 
-  // Função para resetar o preview baseado na receita selecionada
-  const resetPreviewToSelectedRecipe = useCallback(() => {
-    revokeObjectUrl();
-    if (selectedRecipe?.foto) {
-      setPreviewUrl(selectedRecipe.foto);
-    } else {
-      setPreviewUrl("");
+  // Effect ONLY for cleanup and initial sync when selected recipe changes
+  useEffect(() => {
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
-  }, [selectedRecipe, revokeObjectUrl]);
 
-  // Handler para mudança de arquivo
+    // Clean up old object URL
+    cleanupObjectUrl();
+
+    // Update preview based on selected recipe
+    const newPreviewUrl = selectedRecipe?.foto ?? "";
+    setPreviewUrl(newPreviewUrl);
+
+    // Cleanup on unmount
+    return cleanupObjectUrl;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRecipe]); // Only depend on selectedRecipe
+
   const handleFileChange = useCallback(
-    (
-      e: React.ChangeEvent<HTMLInputElement>,
-      onChange: (event: any) => void,
-    ) => {
-      const file = e.target.files?.[0];
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      const file = e.target.files?.[0] ?? null;
       if (file) {
         setValue("fotoUrl", "");
-        onChange(e);
+        setValue("fotoFile", e.target.files);
         updatePreviewFromFile(file);
       } else {
         setValue("fotoFile", undefined);
-        onChange(e);
-        resetPreviewToSelectedRecipe();
+        // Reset preview to selected recipe if no file
+        const newPreviewUrl = selectedRecipe?.foto ?? "";
+        setPreviewUrl(newPreviewUrl);
       }
     },
-    [setValue, updatePreviewFromFile, resetPreviewToSelectedRecipe],
+    [setValue, updatePreviewFromFile, selectedRecipe],
   );
 
-  // Handler para mudança de URL
   const handleUrlChange = useCallback(
-    (
-      e: React.ChangeEvent<HTMLInputElement>,
-      onChange: (event: any) => void,
-    ) => {
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
       const val = e.target.value.trim();
       if (val) {
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
         setValue("fotoFile", undefined);
-        onChange(e);
+        setValue("fotoUrl", val);
         updatePreviewFromUrl(val);
       } else {
         setValue("fotoUrl", "");
-        onChange(e);
-        resetPreviewToSelectedRecipe();
+        // Reset preview to selected recipe if URL is cleared
+        const newPreviewUrl = selectedRecipe?.foto ?? "";
+        setPreviewUrl(newPreviewUrl);
       }
     },
-    [setValue, updatePreviewFromUrl, resetPreviewToSelectedRecipe],
+    [setValue, updatePreviewFromUrl, selectedRecipe],
   );
-
-  // Efeito apenas para sincronizar com mudanças externas (quando a receita selecionada muda)
-  useEffect(() => {
-    // Limpa o input file
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-
-    // Reseta o preview baseado na receita selecionada
-    resetPreviewToSelectedRecipe();
-
-    // Cleanup no unmount
-    return () => {
-      revokeObjectUrl();
-    };
-  }, [selectedRecipe, resetPreviewToSelectedRecipe, revokeObjectUrl]);
 
   const currentUploadName = selectedRecipe?.foto?.startsWith("/uploads/")
     ? selectedRecipe.foto.split("/").pop()
     : null;
 
-  const fotoFileProps = register("fotoFile");
-  const fotoUrlProps = register("fotoUrl");
-
   const showCurrentFile =
-    currentUploadName &&
+    currentUploadName !== null &&
     (!fotoFile || fotoFile.length === 0) &&
     (!fotoUrl || fotoUrl.trim() === "");
 
@@ -165,117 +142,105 @@ export default function RecipeFormPanel({
         <h2>{selectedRecipe ? "Editar receita" : "Nova receita"}</h2>
         <p>Preencha os campos e salve.</p>
       </div>
-      <form onSubmit={onSubmit} className={styles.form}>
+      <form onSubmit={onSubmit} className={styles.form} noValidate>
+        {/* Título */}
         <div className={styles.field}>
-          <label>Título</label>
-          <Controller
-            name="titulo"
-            control={control}
-            rules={{ required: "Informe o título da receita." }}
-            render={({ field }) => <input {...field} />}
+          <label htmlFor="titulo">Título</label>
+          <input
+            id="titulo"
+            type="text"
+            {...register("titulo")}
+            aria-invalid={!!errors.titulo}
           />
-          {errors.titulo ? (
-            <span className={styles.errorText}>{errors.titulo.message}</span>
-          ) : null}
+          {errors.titulo && (
+            <span className={styles.errorText} role="alert">
+              {errors.titulo.message}
+            </span>
+          )}
         </div>
 
+        {/* Resumo */}
         <div className={styles.field}>
-          <label>Resumo</label>
-          <Controller
-            name="resumo"
-            control={control}
-            rules={{ required: "Informe um resumo curto." }}
-            render={({ field }) => <textarea rows={3} {...field} />}
+          <label htmlFor="resumo">Resumo</label>
+          <textarea
+            id="resumo"
+            rows={3}
+            {...register("resumo")}
+            aria-invalid={!!errors.resumo}
           />
-          {errors.resumo ? (
-            <span className={styles.errorText}>{errors.resumo.message}</span>
-          ) : null}
+          {errors.resumo && (
+            <span className={styles.errorText} role="alert">
+              {errors.resumo.message}
+            </span>
+          )}
         </div>
 
+        {/* Tipo */}
         <div className={styles.field}>
-          <label>Tipo</label>
-          <Controller
-            name="tipo"
-            control={control}
-            rules={{ required: "Informe o tipo da receita." }}
-            render={({ field }) => (
-              <div className={styles.typeInputWrapper}>
-                <input
-                  {...field}
-                  list="tipos-list"
-                  placeholder="Selecione um tipo existente ou digite um novo"
-                  className={styles.typeInput}
-                />
-                <datalist id="tipos-list">
-                  {availableTypes.map((type) => (
-                    <option key={type} value={type} />
-                  ))}
-                </datalist>
-              </div>
-            )}
-          />
-          {errors.tipo ? (
-            <span className={styles.errorText}>{errors.tipo.message}</span>
-          ) : null}
+          <label htmlFor="tipo">Tipo</label>
+          <div className={styles.typeInputWrapper}>
+            <input
+              id="tipo"
+              {...register("tipo")}
+              list="tipos-list"
+              placeholder="Selecione um tipo existente ou digite um novo"
+              className={styles.typeInput}
+              aria-invalid={!!errors.tipo}
+            />
+            <datalist id="tipos-list">
+              {availableTypes.map((type) => (
+                <option key={type} value={type} />
+              ))}
+            </datalist>
+          </div>
+          {errors.tipo && (
+            <span className={styles.errorText} role="alert">
+              {errors.tipo.message}
+            </span>
+          )}
         </div>
 
+        {/* Tempo e Rendimento */}
         <div className={styles.grid}>
           <div className={styles.field}>
-            <label>Tempo de preparo (minutos)</label>
-            <Controller
-              name="tempoDePreparo"
-              control={control}
-              rules={{ required: "Informe o tempo de preparo." }}
-              render={({ field }) => (
-                <div className={styles.inputWithSuffix}>
-                  <input
-                    type="number"
-                    min={1}
-                    step={1}
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value === "" ? "" : value);
-                    }}
-                  />
-                  <span>min</span>
-                </div>
-              )}
-            />
-            {errors.tempoDePreparo ? (
-              <span className={styles.errorText}>
+            <label htmlFor="tempoDePreparo">Tempo de preparo (minutos)</label>
+            <div className={styles.inputWithSuffix}>
+              <input
+                id="tempoDePreparo"
+                type="number"
+                min={1}
+                step={1}
+                {...register("tempoDePreparo")}
+                aria-invalid={!!errors.tempoDePreparo}
+              />
+              <span>min</span>
+            </div>
+            {errors.tempoDePreparo && (
+              <span className={styles.errorText} role="alert">
                 {errors.tempoDePreparo.message}
               </span>
-            ) : null}
+            )}
           </div>
 
           <div className={styles.field}>
-            <label>Rendimento (porções)</label>
-            <Controller
-              name="rendimento"
-              control={control}
-              rules={{ required: "Informe o rendimento." }}
-              render={({ field }) => (
-                <input
-                  type="number"
-                  min={1}
-                  step={1}
-                  {...field}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    field.onChange(value === "" ? "" : value);
-                  }}
-                />
-              )}
+            <label htmlFor="rendimento">Rendimento (porções)</label>
+            <input
+              id="rendimento"
+              type="number"
+              min={1}
+              step={1}
+              {...register("rendimento")}
+              aria-invalid={!!errors.rendimento}
             />
-            {errors.rendimento ? (
-              <span className={styles.errorText}>
+            {errors.rendimento && (
+              <span className={styles.errorText} role="alert">
                 {errors.rendimento.message}
               </span>
-            ) : null}
+            )}
           </div>
         </div>
 
+        {/* Imagem */}
         <div className={styles.imageSection}>
           {previewUrl ? (
             <div className={styles.imagePreview}>
@@ -299,27 +264,16 @@ export default function RecipeFormPanel({
 
           <div className={styles.grid}>
             <div className={styles.field}>
-              <label>Imagem (upload)</label>
+              <label htmlFor="fotoFile">Imagem (upload)</label>
               <input
+                id="fotoFile"
                 type="file"
                 accept="image/*"
-                {...fotoFileProps}
                 ref={(el) => {
-                  fotoFileProps.ref(el);
+                  register("fotoFile").ref(el);
                   fileInputRef.current = el;
                 }}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    setValue("fotoUrl", "");
-                    fotoFileProps.onChange(e);
-                    updatePreviewFromFile(file);
-                  } else {
-                    setValue("fotoFile", undefined);
-                    fotoFileProps.onChange(e);
-                    resetPreviewToSelectedRecipe();
-                  }
-                }}
+                onChange={handleFileChange}
               />
               {showCurrentFile && (
                 <span className={styles.currentFile}>
@@ -329,86 +283,71 @@ export default function RecipeFormPanel({
             </div>
 
             <div className={styles.field}>
-              <label>Imagem (URL)</label>
+              <label htmlFor="fotoUrl">Imagem (URL)</label>
               <input
+                id="fotoUrl"
+                type="url"
                 placeholder="https://"
-                {...fotoUrlProps}
-                onChange={(e) => {
-                  const val = e.target.value.trim();
-                  if (val) {
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = "";
-                    }
-                    setValue("fotoFile", undefined);
-                    fotoUrlProps.onChange(e);
-                    updatePreviewFromUrl(val);
-                  } else {
-                    setValue("fotoUrl", "");
-                    fotoUrlProps.onChange(e);
-                    resetPreviewToSelectedRecipe();
-                  }
-                }}
+                value={fotoUrl ?? ""}
+                onChange={handleUrlChange}
               />
             </div>
           </div>
         </div>
 
+        {/* Culinária */}
         <div className={styles.field}>
-          <label>Culinária (uma por linha)</label>
-          <Controller
-            name="culinariaText"
-            control={control}
-            render={({ field }) => <textarea rows={2} {...field} />}
+          <label htmlFor="culinariaText">Culinária (uma por linha)</label>
+          <textarea
+            id="culinariaText"
+            rows={2}
+            {...register("culinariaText")}
           />
         </div>
 
+        {/* Ingredientes */}
         <div className={styles.field}>
-          <label>Ingredientes (um por linha)</label>
-          <Controller
-            name="ingredientesText"
-            control={control}
-            rules={{ required: "Informe pelo menos um ingrediente." }}
-            render={({ field }) => <textarea rows={5} {...field} />}
+          <label htmlFor="ingredientesText">Ingredientes (um por linha)</label>
+          <textarea
+            id="ingredientesText"
+            rows={5}
+            {...register("ingredientesText")}
+            aria-invalid={!!errors.ingredientesText}
           />
-          {errors.ingredientesText ? (
-            <span className={styles.errorText}>
+          {errors.ingredientesText && (
+            <span className={styles.errorText} role="alert">
               {errors.ingredientesText.message}
             </span>
-          ) : null}
+          )}
         </div>
 
+        {/* Preparo */}
         <div className={styles.field}>
-          <label>Modo de preparo (um passo por linha)</label>
-          <Controller
-            name="preparoText"
-            control={control}
-            rules={{ required: "Descreva o modo de preparo." }}
-            render={({ field }) => <textarea rows={5} {...field} />}
+          <label htmlFor="preparoText">
+            Modo de preparo (um passo por linha)
+          </label>
+          <textarea
+            id="preparoText"
+            rows={5}
+            {...register("preparoText")}
+            aria-invalid={!!errors.preparoText}
           />
-          {errors.preparoText ? (
-            <span className={styles.errorText}>
+          {errors.preparoText && (
+            <span className={styles.errorText} role="alert">
               {errors.preparoText.message}
             </span>
-          ) : null}
+          )}
         </div>
 
+        {/* Vegano */}
         <div className={styles.switches}>
-          <Controller
-            name="vegano"
-            control={control}
-            render={({ field }) => (
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!!field.value}
-                  onChange={(e) => field.onChange(e.target.checked)}
-                />
-                Vegano
-              </label>
-            )}
-          />
+          <label>
+            <input type="checkbox" {...register("vegano")} />
+            Vegano
+          </label>
         </div>
 
+        {/* Submit Button */}
         <div className={styles.actions}>
           <button
             type="submit"

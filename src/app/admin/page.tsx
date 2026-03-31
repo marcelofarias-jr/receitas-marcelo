@@ -1,17 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import styles from "./page.module.scss";
 import AdminAuthCard from "../../components/AdminAuthCard/AdminAuthCard";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
 import RecipeListPanel from "../../components/RecipeListPanel/RecipeListPanel";
-import type { AdminFormValues } from "../../types/admin";
 import type { Recipe, RecipesData } from "../../types/recipes";
 import RecipeFormPanel from "@/components/RecipeFormPanel/RecipeFormPanel";
 import { toast, ToastContainer } from "react-toastify";
+import {
+  recipeFormSchema,
+  type RecipeFormValues,
+} from "../../schemas/recipe.schema";
 
-const emptyForm: AdminFormValues = {
+const emptyForm: RecipeFormValues = {
   titulo: "",
   resumo: "",
   tipo: "",
@@ -25,46 +29,44 @@ const emptyForm: AdminFormValues = {
   vegano: false,
 };
 
-function toLines(value: string) {
+function toLines(value: string): string[] {
   return value
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
 }
 
-function toLineText(values: string[]) {
+function toLineText(values: string[]): string {
   return values.join("\n");
 }
 
-function parseNumber(value: string) {
+function parseNumber(value: string): string {
   const match = value.match(/\d+/g);
   return match ? match.join("") : "";
 }
 
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isFetchingRecipes, setIsFetchingRecipes] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [authed, setAuthed] = useState<boolean>(false);
+  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+  const [isFetchingRecipes, setIsFetchingRecipes] = useState<boolean>(false);
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    control,
-    formState: { errors, isSubmitting },
-  } = useForm<AdminFormValues>({
+  const methods = useForm<RecipeFormValues>({
+    resolver: zodResolver(recipeFormSchema),
     defaultValues: emptyForm,
     mode: "onChange",
   });
+
+  const {
+    reset,
+    formState: { isSubmitting },
+  } = methods;
 
   const selectedRecipe = useMemo(
     () => recipes.find((recipe) => recipe.slug === selectedSlug) ?? null,
@@ -76,21 +78,26 @@ export default function AdminPage() {
     return Array.from(types).sort();
   }, [recipes]);
 
-  const fetchRecipes = useCallback(async () => {
+  const fetchRecipes = useCallback(async (): Promise<void> => {
     setIsFetchingRecipes(true);
-    const response = await fetch("/api/receitas", {
-      cache: "no-store",
-      credentials: "include",
-    });
-    const data = (await response.json()) as RecipesData;
-    setRecipes((data.receitas ?? []).filter((recipe) => !recipe.deleted));
-    setIsFetchingRecipes(false);
+    try {
+      const response = await fetch("/api/receitas", {
+        cache: "no-store",
+        credentials: "include",
+      });
+      const data = (await response.json()) as RecipesData;
+      setRecipes((data.receitas ?? []).filter((recipe) => !recipe.deleted));
+    } catch (error) {
+      console.error("Erro ao carregar receitas:", error);
+      toast.error("Erro ao carregar receitas");
+    } finally {
+      setIsFetchingRecipes(false);
+    }
   }, []);
 
-  // Efeito para resetar o formulário quando a receita selecionada muda
+  // Reset form when selected recipe changes
   useEffect(() => {
     if (selectedRecipe) {
-      // Reset com os valores da receita selecionada
       reset({
         titulo: selectedRecipe.titulo,
         resumo: selectedRecipe.resumo,
@@ -107,71 +114,91 @@ export default function AdminPage() {
         vegano: selectedRecipe.vegano,
       });
     } else {
-      // Reset para formulário vazio
       reset(emptyForm);
     }
   }, [selectedRecipe, reset]);
 
   useEffect(() => {
-    const run = async () => {
-      const response = await fetch("/api/admin/me", { cache: "no-store" });
-      const data = (await response.json()) as { ok: boolean };
-      setAuthed(data.ok);
-      if (data.ok) {
-        await fetchRecipes();
+    const run = async (): Promise<void> => {
+      try {
+        const response = await fetch("/api/admin/me", { cache: "no-store" });
+        const data = (await response.json()) as { ok: boolean };
+        setAuthed(data.ok);
+        if (data.ok) {
+          await fetchRecipes();
+        }
+      } catch (error) {
+        console.error("Erro ao verificar autenticação:", error);
+        setAuthed(false);
       }
     };
 
     void run();
   }, [fetchRecipes]);
 
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     event.preventDefault();
     setIsLoggingIn(true);
 
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (!response.ok) {
-      toast.error("Senha incorreta.");
+      if (!response.ok) {
+        toast.error("Senha incorreta.");
+        setIsLoggingIn(false);
+        return;
+      }
+
+      setAuthed(true);
+      await fetchRecipes();
+    } catch (error) {
+      console.error("Erro no login:", error);
+      toast.error("Erro ao realizar login");
+    } finally {
       setIsLoggingIn(false);
-      return;
     }
-
-    setAuthed(true);
-    await fetchRecipes();
-    setIsLoggingIn(false);
   };
 
-  const onSubmit = handleSubmit(async (values) => {
-    console.log("Valores do formulário ao salvar:", values); // Debug
+  const onSubmit = async (values: RecipeFormValues): Promise<void> => {
+    console.log("SUBMIT - Current form values:", values);
 
-    let foto = values.fotoUrl.trim();
+    let foto = values.fotoUrl?.trim() || "";
     const file = values.fotoFile?.[0];
 
     if (file) {
       setIsUploadingImage(true);
-      const formData = new FormData();
-      formData.append("file", file);
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
 
-      const uploadResponse = await fetch("/api/uploads", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
+        const uploadResponse = await fetch("/api/uploads", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
 
-      if (!uploadResponse.ok) {
-        toast.error("Nao foi possivel enviar a imagem.");
+        if (!uploadResponse.ok) {
+          toast.error("Não foi possível enviar a imagem.");
+          setIsUploadingImage(false);
+          return;
+        }
+
+        const uploadData = (await uploadResponse.json()) as { url: string };
+        foto = uploadData.url;
+      } catch (error) {
+        console.error("Erro no upload:", error);
+        toast.error("Erro no upload da imagem");
         setIsUploadingImage(false);
         return;
+      } finally {
+        setIsUploadingImage(false);
       }
-
-      const uploadData = (await uploadResponse.json()) as { url: string };
-      foto = uploadData.url;
-      setIsUploadingImage(false);
     }
 
     if (!foto && selectedRecipe?.foto) {
@@ -193,7 +220,7 @@ export default function AdminPage() {
       vegano: values.vegano,
       igredientes: toLines(values.ingredientesText),
       preparo: toLines(values.preparoText),
-      culinária: toLines(values.culinariaText),
+      culinária: toLines(values.culinariaText || ""),
     };
 
     const isEdit = Boolean(selectedRecipe);
@@ -202,72 +229,85 @@ export default function AdminPage() {
       : "/api/receitas";
     const method = isEdit ? "PUT" : "POST";
 
-    const response = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) {
-      toast.error("Nao foi possivel salvar a receita.");
-      return;
+      if (!response.ok) {
+        toast.error("Não foi possível salvar a receita.");
+        return;
+      }
+
+      const savedRecipe = (await response.json()) as Recipe;
+      await fetchRecipes();
+
+      if (isEdit) {
+        setSelectedSlug(savedRecipe.slug);
+      } else {
+        setSelectedSlug(null);
+        reset(emptyForm);
+      }
+
+      toast.success("Receita salva com sucesso.");
+    } catch (error) {
+      console.error("Erro ao salvar receita:", error);
+      toast.error("Erro ao salvar receita");
     }
+  };
 
-    const savedRecipe = (await response.json()) as Recipe;
-    await fetchRecipes();
+  const handleDeleteBySlug = async (slug: string): Promise<void> => {
+    try {
+      const response = await fetch(`/api/receitas/${slug}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
-    if (isEdit) {
-      // Atualiza a receita selecionada com os novos dados
-      setSelectedSlug(savedRecipe.slug);
-      // O useEffect vai resetar o formulário com os novos valores
-    } else {
+      if (!response.ok) {
+        toast.error("Não foi possível excluir a receita.");
+        return;
+      }
+
+      await fetchRecipes();
+      if (selectedSlug === slug) {
+        setSelectedSlug(null);
+      }
+      toast.success("Receita excluída.");
+    } catch (error) {
+      console.error("Erro ao excluir receita:", error);
+      toast.error("Erro ao excluir receita");
+    } finally {
+      setPendingDelete(null);
+    }
+  };
+
+  const handleNew = (): void => {
+    setSelectedSlug(null);
+  };
+
+  const handleLogout = async (): Promise<void> => {
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/admin/login", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      setAuthed(false);
+      setRecipes([]);
       setSelectedSlug(null);
       reset(emptyForm);
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    } finally {
+      setIsLoggingOut(false);
     }
-    toast.success("Receita salva com sucesso.");
-  });
-
-  const handleDeleteBySlug = async (slug: string) => {
-    const response = await fetch(`/api/receitas/${slug}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      toast.error("Nao foi possivel excluir a receita.");
-      return;
-    }
-
-    await fetchRecipes();
-    if (selectedSlug === slug) {
-      setSelectedSlug(null);
-    }
-    toast.success("Receita excluida.");
-    setPendingDelete(null);
   };
 
-  const handleNew = () => {
-    setSelectedSlug(null);
-    // O useEffect vai resetar para emptyForm automaticamente
-  };
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await fetch("/api/admin/login", {
-      method: "DELETE",
-      credentials: "include",
-    });
-    setAuthed(false);
-    setRecipes([]);
-    setSelectedSlug(null);
-    reset(emptyForm);
-    setIsLoggingOut(false);
-  };
-
-  const handleEdit = (recipe: Recipe) => {
+  const handleEdit = (recipe: Recipe): void => {
     setSelectedSlug(recipe.slug);
-    // O useEffect vai resetar o formulário com os valores da receita
   };
 
   if (!authed) {
@@ -308,19 +348,16 @@ export default function AdminPage() {
               {isLoggingOut ? "Saindo..." : "Sair"}
             </button>
           </div>
-          <RecipeFormPanel
-            key={selectedSlug ?? "new"}
-            selectedRecipe={selectedRecipe}
-            isSubmitting={isSubmitting}
-            isUploadingImage={isUploadingImage}
-            register={register}
-            setValue={setValue}
-            watch={watch}
-            control={control}
-            errors={errors}
-            onSubmit={onSubmit}
-            availableTypes={availableTypes}
-          />
+          <FormProvider {...methods}>
+            <RecipeFormPanel
+              key={selectedSlug ?? "new"}
+              selectedRecipe={selectedRecipe}
+              isSubmitting={isSubmitting}
+              isUploadingImage={isUploadingImage}
+              onSubmit={methods.handleSubmit(onSubmit)}
+              availableTypes={availableTypes}
+            />
+          </FormProvider>
         </main>
         <DeleteModal
           isOpen={Boolean(pendingDelete)}
