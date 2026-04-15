@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "../../app/receitas/[slug]/page.module.scss";
-import RecipeHeader from "../RecipeHeader/RecipeHeader";
-import RecipeIngredients from "../RecipeIngredients/RecipeIngredients";
-import RecipeSteps from "../RecipeSteps/RecipeSteps";
+import RecipeHeader from "../RecipeHeader";
+import RecipeIngredients from "../RecipeIngredients";
+import RecipeSteps from "../RecipeSteps";
 import type { Recipe } from "../../types/recipes";
 
 function getImageUrl(recipe: Recipe): string {

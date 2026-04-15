@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
-import Spinner from "../Spinner/Spinner";
+import Spinner from "../UI/Spinner";
+import RecipeImage from "../UI/RecipeImage";
+import CategoryTag from "../UI/CategoryTag";
 import styles from "./HomeHero.module.scss";
 import type { Recipe } from "../../types/recipes";
 
@@ -45,18 +46,14 @@ export default function HomeHero({
       ) : heroRecipe ? (
         <div className={styles.heroCard}>
           <div className={styles.heroCardImage}>
-            {heroImage ? (
-              <Image
-                src={heroImage}
-                alt={heroRecipe.titulo}
-                width={560}
-                height={420}
-                sizes="(max-width: 1024px) 90vw, 480px"
-                priority
-              />
-            ) : (
-              <div className={styles.cardImagePlaceholder} />
-            )}
+            <RecipeImage
+              src={heroImage}
+              alt={heroRecipe.titulo}
+              width={560}
+              height={420}
+              sizes="(max-width: 1024px) 90vw, 480px"
+              priority
+            />
           </div>
           <div className={styles.heroCardBody}>
             <p className={styles.cardTag}>Destaque da semana</p>

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-import RecipeDetailClient from "../../../components/RecipeDetailClient/RecipeDetailClient";
+import RecipeDetailClient from "../../../components/RecipeDetailClient";
 import {
   getRecipeBySlug,
   incrementRecipeAccessBySlug,

@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import LoadingButton from "../UI/LoadingButton";
 import styles from "./AdminAuthCard.module.scss";
 
 type AdminAuthCardProps = {
@@ -35,9 +36,9 @@ export default function AdminAuthCard({
           value={password}
           onChange={(event) => onPasswordChange(event.target.value)}
         />
-        <button type="submit" disabled={isLoggingIn}>
-          {isLoggingIn ? "Entrando..." : "Entrar"}
-        </button>
+        <LoadingButton type="submit" isLoading={isLoggingIn} loadingText="Entrando...">
+          Entrar
+        </LoadingButton>
       </form>
     </main>
   );

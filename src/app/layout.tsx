@@ -3,7 +3,7 @@ import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.scss";
 import { RecipesProvider } from "./state/recipes-context";
-import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
+import ThemeToggle from "../components/ThemeToggle";
 
 const display = Playfair_Display({
   variable: "--font-display",

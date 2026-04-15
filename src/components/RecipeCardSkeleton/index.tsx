@@ -1,4 +1,4 @@
-import Spinner from "../Spinner/Spinner";
+import Spinner from "../UI/Spinner";
 import styles from "./RecipeCardSkeleton.module.scss";
 
 export default function RecipeCardSkeleton() {

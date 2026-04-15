@@ -1,4 +1,6 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import IconButton from "../UI/IconButton";
+import LoadingButton from "../UI/LoadingButton";
 import styles from "./RecipeListPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
 
@@ -29,10 +31,15 @@ export default function RecipeListPanel({
             <h1>Receitas</h1>
             <p>Selecione uma receita para editar.</p>
           </div>
-          <button type="button" className={styles.newButton} onClick={onNew}>
+          <LoadingButton
+            type="button"
+            isLoading={false}
+            onClick={onNew}
+            className={styles.newButton}
+          >
             <Plus size={16} aria-hidden="true" />
             Nova receita
-          </button>
+          </LoadingButton>
         </div>
       </div>
       <div className={styles.recipeList}>
@@ -48,26 +55,21 @@ export default function RecipeListPanel({
           >
             <strong>{recipe.titulo}</strong>
             <div className={styles.recipeActions}>
-              <button
-                type="button"
-                className={styles.iconButton}
+              <IconButton
+                icon={<Pencil size={16} />}
                 onClick={() => onEdit(recipe)}
+                disabled={isSubmitting}
                 aria-label="Editar receita"
                 title="Editar receita"
-                disabled={isSubmitting}
-              >
-                <Pencil size={16} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                className={`${styles.iconButton} ${styles.dangerButton}`}
+              />
+              <IconButton
+                icon={<Trash2 size={16} />}
+                isDanger
                 onClick={() => onRequestDelete(recipe.slug)}
+                disabled={isSubmitting}
                 aria-label="Excluir receita"
                 title="Excluir receita"
-                disabled={isSubmitting}
-              >
-                <Trash2 size={16} aria-hidden="true" />
-              </button>
+              />
             </div>
           </div>
         ))}

@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import styles from "./page.module.scss";
-import AdminAuthCard from "../../components/AdminAuthCard/AdminAuthCard";
-import DeleteModal from "../../components/DeleteModal/DeleteModal";
-import RecipeListPanel from "../../components/RecipeListPanel/RecipeListPanel";
+import AdminAuthCard from "../../components/AdminAuthCard";
+import DeleteModal from "../../components/DeleteModal";
+import RecipeListPanel from "../../components/RecipeListPanel";
 import type { Recipe, RecipesData } from "../../types/recipes";
-import RecipeFormPanel from "@/components/RecipeFormPanel/RecipeFormPanel";
+import RecipeFormPanel from "@/components/RecipeFormPanel";
 import { toast, ToastContainer } from "react-toastify";
 import {
   recipeFormSchema,

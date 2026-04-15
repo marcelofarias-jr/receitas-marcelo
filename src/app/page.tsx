@@ -5,14 +5,14 @@ export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { useRecipesAccess } from "./state/recipes-context";
-import CategoryChip from "../components/CategoryChip/CategoryChip";
-import FeaturedItem from "../components/FeaturedItem/FeaturedItem";
-import FeaturedItemSkeleton from "../components/FeaturedItemSkeleton/FeaturedItemSkeleton";
-import HomeHero from "../components/HomeHero/HomeHero";
-import RecipeCard from "../components/RecipeCard/RecipeCard";
-import RecipeCardSkeleton from "../components/RecipeCardSkeleton/RecipeCardSkeleton";
-import IngredientSearch from "../components/IngredientSearch/IngredientSearch";
-import SearchBar from "../components/SearchBar/SearchBar";
+import CategoryChip from "../components/CategoryChip";
+import FeaturedItem from "../components/FeaturedItem";
+import FeaturedItemSkeleton from "../components/FeaturedItemSkeleton";
+import HomeHero from "../components/HomeHero";
+import RecipeCard from "../components/RecipeCard";
+import RecipeCardSkeleton from "../components/RecipeCardSkeleton";
+import IngredientSearch from "../components/IngredientSearch";
+import SearchBar from "../components/SearchBar";
 import {
   getIngredientMatchCount,
   useRecipeSearch,

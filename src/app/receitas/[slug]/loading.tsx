@@ -1,4 +1,4 @@
-import Spinner from "../../../components/Spinner/Spinner";
+import Spinner from "../../../components/UI/Spinner";
 import styles from "./page.module.scss";
 import skeletonStyles from "./loading.module.scss";
 

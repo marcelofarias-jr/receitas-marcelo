@@ -1,16 +1,17 @@
-import styles from "./SearchBar.module.scss";
+import styles from "./SearchInput.module.scss";
 
-type SearchBarProps = {
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
+type SearchInputProps = React.InputHTMLAttributes<HTMLInputElement> & {
+  onClear?: () => void;
+  hasValue?: boolean;
 };
 
-export default function SearchBar({
+export default function SearchInput({
   value,
-  onChange,
-  placeholder,
-}: SearchBarProps) {
+  onClear,
+  hasValue = !!value,
+  placeholder = "Buscar...",
+  ...props
+}: SearchInputProps) {
   return (
     <div className={styles.wrapper}>
       <svg
@@ -31,17 +32,15 @@ export default function SearchBar({
       </svg>
       <input
         className={styles.input}
-        type="search"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder ?? "Buscar receitas..."}
-        aria-label="Buscar receitas"
+        placeholder={placeholder}
+        {...props}
       />
-      {value && (
+      {hasValue && onClear && (
         <button
           className={styles.clear}
-          onClick={() => onChange("")}
-          aria-label="Limpar busca"
+          onClick={onClear}
+          aria-label="Limpar"
           type="button"
         >
           ✕

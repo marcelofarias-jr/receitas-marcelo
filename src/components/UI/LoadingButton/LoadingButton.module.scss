@@ -1,0 +1,33 @@
+.button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-dark, #d97706);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.danger {
+    background: var(--color-error, #d9534f);
+
+    &:hover:not(:disabled) {
+      background: var(--color-error-dark, #c9302c);
+    }
+  }
+
+  &.loading {
+    pointer-events: none;
+  }
+}
