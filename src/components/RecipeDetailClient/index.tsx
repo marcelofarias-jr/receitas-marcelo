@@ -33,7 +33,10 @@ type Props = {
 export default function RecipeDetailClient({ slug, initialRecipe }: Props) {
   const [recipe, setRecipe] = useState<Recipe>(initialRecipe);
   const slugRef = useRef(slug);
-  slugRef.current = slug;
+
+  useEffect(() => {
+    slugRef.current = slug;
+  }, [slug]);
 
   useEffect(() => {
     const eventSource = new EventSource("/api/updates");
