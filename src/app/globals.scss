@@ -28,6 +28,31 @@
   --max-width: 1120px;
 }
 
+[data-theme="dark"] {
+  --color-bg: #1a1410;
+  --color-ink: #faf5f0;
+  --color-primary: #e8622a;
+  --color-primary-dark: #d44a14;
+  --color-primary-fade: rgba(232, 98, 42, 0.22);
+  --color-primary-glow: rgba(232, 98, 42, 0.12);
+  --color-secondary: #2e2520;
+  --color-border: #3a2e26;
+  --color-card: #241c16;
+  --color-muted: #c0a898;
+  --color-white: #faf5f0;
+  --color-red: #e07070;
+  --color-error: #e07070;
+  --color-warm-tint: #1e1610;
+  --color-overlay: rgba(0, 0, 0, 0.65);
+  --color-skeleton-from: #2e2218;
+  --color-skeleton-to: #3a2c20;
+  --color-placeholder-to: #3a2c20;
+  --color-skeleton-link-from: #4a3020;
+  --color-skeleton-link-to: #5a3c28;
+  --shadow-card: 0 14px 40px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -44,8 +69,15 @@ body {
 body {
   font-family: var(--font-sans), "Helvetica Neue", sans-serif;
   color: var(--color-ink);
-  background: linear-gradient(180deg, #faf8f5 0%, #f4eee6 100%);
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    var(--color-secondary) 100%
+  );
   position: relative;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 body::before {

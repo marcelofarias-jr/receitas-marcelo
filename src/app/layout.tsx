@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Source_Sans_3 } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.scss";
 import { RecipesProvider } from "./state/recipes-context";
+import ThemeToggle from "../components/ThemeToggle/ThemeToggle";
 
 const display = Playfair_Display({
   variable: "--font-display",
@@ -21,6 +23,7 @@ export const metadata: Metadata = {
   title: "Receitas do Marcelo",
   description: "Receitas caseiras com sabor de família.",
   applicationName: "Receitas do Marcelo",
+  keywords: "receitas, culinária, comida caseira, bolo, massa, sobremesa",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -34,15 +37,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value === "dark" ? "dark" : "light";
+
   return (
-    <html lang="pt-BR" className={`${display.variable} ${sans.variable}`}>
+    <html
+      lang="pt-BR"
+      className={`${display.variable} ${sans.variable}`}
+      data-theme={theme}
+      suppressHydrationWarning
+    >
       <body>
         <RecipesProvider>{children}</RecipesProvider>
+        <ThemeToggle />
       </body>
     </html>
   );
