@@ -24,7 +24,8 @@ export default function NotFound() {
         <h1 className={styles.title}>Página não encontrada</h1>
         <p className={styles.description}>
           Essa receita sumiu da cozinha. Talvez tenha sido devorada antes de
-          você chegar.
+          você chegar, ou talvez nunca tenha existido. De qualquer forma, não se
+          preocupe, temos muitas outras receitas deliciosas para você explorar!
         </p>
         <Link href="/" className={styles.button}>
           Voltar para a cozinha
