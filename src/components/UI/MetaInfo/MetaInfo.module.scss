@@ -1,18 +1,15 @@
 .meta {
   display: flex;
-  gap: 1.5rem;
+  gap: 8px;
   font-size: 0.875rem;
-  color: var(--color-muted);
+  color: var(--color-white);
 
   span {
     display: flex;
     align-items: center;
-
-    &:not(:first-child) {
-      &::before {
-        content: "•";
-        margin-right: 1.5rem;
-      }
-    }
+    background-color: var(--color-primary);
+    border-radius: 14px;
+    padding: 0.25rem 0.75rem;
+    font-weight: 500;
   }
 }
