@@ -11,6 +11,12 @@ import FeaturedItemSkeleton from "../components/FeaturedItemSkeleton/FeaturedIte
 import HomeHero from "../components/HomeHero/HomeHero";
 import RecipeCard from "../components/RecipeCard/RecipeCard";
 import RecipeCardSkeleton from "../components/RecipeCardSkeleton/RecipeCardSkeleton";
+import IngredientSearch from "../components/IngredientSearch/IngredientSearch";
+import SearchBar from "../components/SearchBar/SearchBar";
+import {
+  getIngredientMatchCount,
+  useRecipeSearch,
+} from "../lib/use-recipe-search";
 import type { Recipe, RecipesData } from "../types/recipes";
 
 const featuredCountFallback = 5;
@@ -42,6 +48,8 @@ function getImageUrl(recipe: Recipe): string {
 export default function Home() {
   const { accessById } = useRecipesAccess();
   const [activeCategory, setActiveCategory] = useState(allCategory);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [ingredientFilters, setIngredientFilters] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -86,13 +94,30 @@ export default function Home() {
   const heroRecipe = featuredRecipes[0] ?? recipes[0];
   const heroImage = heroRecipe ? getImageUrl(heroRecipe) : "";
 
+  const searchResults = useRecipeSearch(recipes, {
+    query: searchQuery,
+    ingredients: ingredientFilters,
+  });
+
+  const isFiltering =
+    searchQuery.trim().length > 0 || ingredientFilters.length > 0;
+
   const filteredRecipes = useMemo(() => {
+    const base = isFiltering ? searchResults : recipes;
+
     if (activeCategory === allCategory) {
-      return recipes;
+      return base;
     }
 
-    return recipes.filter((recipe) => recipe.tipo === activeCategory);
-  }, [activeCategory, recipes]);
+    return base.filter((recipe) => recipe.tipo === activeCategory);
+  }, [activeCategory, recipes, isFiltering, searchResults]);
+
+  const ingredientMatchCount = useMemo(() => {
+    if (!ingredientFilters.length) return 0;
+    return recipes.filter(
+      (r) => getIngredientMatchCount(r, ingredientFilters) > 0,
+    ).length;
+  }, [recipes, ingredientFilters]);
 
   return (
     <div className={styles.page}>
@@ -121,11 +146,40 @@ export default function Home() {
         </section>
 
         <section className={styles.recipesLayout} id="receitas">
+          <IngredientSearch
+            ingredients={ingredientFilters}
+            matchCount={ingredientMatchCount}
+            totalRecipes={recipes.length}
+            onChange={(ings) => {
+              setIngredientFilters(ings);
+              if (ings.length > 0) {
+                setSearchQuery("");
+                setActiveCategory(allCategory);
+              }
+            }}
+          />
           <div className={styles.recipesMain}>
-            <div className={styles.sectionHeader}>
-              <h2>Todas as receitas</h2>
-              <p>Da cozinha do Marcelo para o seu dia a dia.</p>
+            <div className={styles.recipesHeader}>
+              <div className={styles.sectionHeader}>
+                <h2>Todas as receitas</h2>
+                <p>Da cozinha do Marcelo para o seu dia a dia.</p>
+              </div>
+              <SearchBar
+                value={searchQuery}
+                onChange={(q) => {
+                  setSearchQuery(q);
+                  if (q) setActiveCategory(allCategory);
+                }}
+                placeholder="Buscar pelo nome da receita..."
+              />
             </div>
+            {searchQuery && (
+              <p className={styles.searchFeedback}>
+                {filteredRecipes.length === 0
+                  ? `Nenhuma receita encontrada para "${searchQuery}"`
+                  : `${filteredRecipes.length} receita${filteredRecipes.length !== 1 ? "s" : ""} encontrada${filteredRecipes.length !== 1 ? "s" : ""} para "${searchQuery}"`}
+              </p>
+            )}
             <div className={styles.cardGrid}>
               {loading
                 ? Array.from({ length: 6 }).map((_, i) => (
