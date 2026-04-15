@@ -1,6 +1,7 @@
 import Link from "next/link";
 import styles from "./RecipeCard.module.scss";
 import CategoryTag from "../UI/CategoryTag";
+import RecipeImage from "../UI/RecipeImage";
 import type { Recipe } from "../../types/recipes";
 
 type RecipeCardProps = {
@@ -9,16 +10,18 @@ type RecipeCardProps = {
 };
 
 export default function RecipeCard({ recipe, imageUrl }: RecipeCardProps) {
+  // Garante que imageUrl nunca é undefined ou null
+  const hasImage = Boolean(imageUrl && imageUrl.trim() !== "");
   return (
     <div className={styles.card}>
       <Link href={`/receitas/${recipe.slug}`} className={styles.cardImageLink}>
         <div className={styles.cardImage}>
-          {imageUrl ? (
-            <img
+          {hasImage ? (
+            <RecipeImage
               src={imageUrl}
               alt={recipe.titulo}
-              loading="lazy"
-              decoding="async"
+              width={480}
+              height={260}
             />
           ) : (
             <div className={styles.cardImagePlaceholder} />

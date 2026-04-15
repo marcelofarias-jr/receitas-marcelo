@@ -36,7 +36,11 @@ export default function AdminAuthCard({
           value={password}
           onChange={(event) => onPasswordChange(event.target.value)}
         />
-        <LoadingButton type="submit" isLoading={isLoggingIn} loadingText="Entrando...">
+        <LoadingButton
+          type="submit"
+          isLoading={isLoggingIn}
+          loadingText="Entrando..."
+        >
           Entrar
         </LoadingButton>
       </form>

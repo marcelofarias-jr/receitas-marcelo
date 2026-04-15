@@ -25,11 +25,7 @@ export default function LoadingButton({
     .join(" ");
 
   return (
-    <button
-      className={buttonClass}
-      disabled={isLoading || disabled}
-      {...props}
-    >
+    <button className={buttonClass} disabled={isLoading || disabled} {...props}>
       {isLoading ? loadingText : children}
     </button>
   );
