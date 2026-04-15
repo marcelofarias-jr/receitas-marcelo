@@ -119,6 +119,10 @@ export default function Home() {
     ).length;
   }, [recipes, ingredientFilters]);
 
+  const isIngredientSearch = ingredientFilters.length > 0;
+  const noIngredientResults =
+    isIngredientSearch && !loading && filteredRecipes.length === 0;
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -181,17 +185,29 @@ export default function Home() {
               </p>
             )}
             <div className={styles.cardGrid}>
-              {loading
-                ? Array.from({ length: 6 }).map((_, i) => (
-                    <RecipeCardSkeleton key={i} />
-                  ))
-                : filteredRecipes.map((recipe) => (
-                    <RecipeCard
-                      key={recipe.id}
-                      recipe={recipe}
-                      imageUrl={getImageUrl(recipe)}
-                    />
-                  ))}
+              {loading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <RecipeCardSkeleton key={i} />
+                ))
+              ) : noIngredientResults ? (
+                <div className={styles.emptyState}>
+                  <p className={styles.emptyStateTitle}>
+                    Nenhuma receita encontrada
+                  </p>
+                  <p className={styles.emptyStateSub}>
+                    Não encontramos receitas com todos esses ingredientes. Tente
+                    remover algum.
+                  </p>
+                </div>
+              ) : (
+                filteredRecipes.map((recipe) => (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    imageUrl={getImageUrl(recipe)}
+                  />
+                ))
+              )}
             </div>
           </div>
           <aside className={styles.sidebar}>

@@ -15,14 +15,15 @@ function normalizar(texto: string): string {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
-function countIngredientMatches(recipe: Recipe, ingredients: string[]): number {
+function hasAllIngredients(recipe: Recipe, ingredients: string[]): boolean {
   const recipeIngredients = recipe.igredientes.map(normalizar);
-  return ingredients.filter((ing) => {
+  return ingredients.every((ing) => {
     const normalized = normalizar(ing.trim());
     return (
-      normalized && recipeIngredients.some((ri) => ri.includes(normalized))
+      normalized.length > 0 &&
+      recipeIngredients.some((ri) => ri.includes(normalized))
     );
-  }).length;
+  });
 }
 
 export function useRecipeSearch(
@@ -46,13 +47,7 @@ export function useRecipeSearch(
 
     if (hasIngredients && params.ingredients) {
       const ings = params.ingredients;
-      result = result
-        .map((recipe) => ({
-          ...recipe,
-          matchScore: countIngredientMatches(recipe, ings),
-        }))
-        .filter((recipe) => recipe.matchScore > 0)
-        .sort((a, b) => b.matchScore - a.matchScore);
+      result = result.filter((recipe) => hasAllIngredients(recipe, ings));
     }
 
     return result;
@@ -64,5 +59,5 @@ export function getIngredientMatchCount(
   ingredients: string[],
 ): number {
   if (!ingredients.length) return 0;
-  return countIngredientMatches(recipe, ingredients);
+  return hasAllIngredients(recipe, ingredients) ? ingredients.length : 0;
 }
