@@ -106,7 +106,7 @@ export default function IngredientSearch({
         />
       </div>
 
-      <p className={styles.hint}>Pressione Enter ou vírgula para adicionar</p>
+      <p className={styles.hint}>Pressione enter ou vírgula para adicionar</p>
 
       {isActive && (
         <div className={styles.result}>

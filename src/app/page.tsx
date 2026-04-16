@@ -113,6 +113,10 @@ export default function Home() {
     return base.filter((recipe) => recipe.tipo === activeCategory);
   }, [activeCategory, recipes, isFiltering, searchResults]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, activeCategory, ingredientFilters]);
+
   const ingredientMatchCount = useMemo(() => {
     if (!ingredientFilters.length) return 0;
     return recipes.filter(
@@ -120,9 +124,18 @@ export default function Home() {
     ).length;
   }, [recipes, ingredientFilters]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
+
   const isIngredientSearch = ingredientFilters.length > 0;
   const noIngredientResults =
     isIngredientSearch && !loading && filteredRecipes.length === 0;
+
+  const totalPages = Math.ceil(filteredRecipes.length / PAGE_SIZE);
+  const paginatedRecipes = filteredRecipes.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   return (
     <div className={styles.page}>
@@ -201,7 +214,7 @@ export default function Home() {
                   </p>
                 </div>
               ) : (
-                filteredRecipes.map((recipe) => (
+                paginatedRecipes.map((recipe) => (
                   <RecipeCard
                     key={recipe.id}
                     recipe={recipe}
@@ -210,6 +223,41 @@ export default function Home() {
                 ))
               )}
             </div>
+            {!loading && totalPages > 1 && (
+              <div className={styles.pagination}>
+                <button
+                  className={styles.pageButton}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  aria-label="Página anterior"
+                >
+                  ←
+                </button>
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button
+                    key={i}
+                    className={`${styles.pageButton} ${
+                      currentPage === i + 1 ? styles.pageButtonActive : ""
+                    }`}
+                    onClick={() => setCurrentPage(i + 1)}
+                    aria-label={`Página ${i + 1}`}
+                    aria-current={currentPage === i + 1 ? "page" : undefined}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  className={styles.pageButton}
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  aria-label="Próxima página"
+                >
+                  →
+                </button>
+              </div>
+            )}
           </div>
           <aside className={styles.sidebar}>
             <div className={styles.sectionHeader}>
