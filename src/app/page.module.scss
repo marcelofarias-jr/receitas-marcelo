@@ -106,6 +106,32 @@
   gap: 1rem;
 }
 
+.contactSection {
+  background: var(--color-card);
+  border-top: 1px solid var(--color-border);
+  padding: 4rem 1.5rem 5rem;
+}
+
+.contactInner {
+  width: min(100% - 2.5rem, 720px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.contactHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contactHeader p {
+  color: var(--color-muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
 .footer {
   padding: 2rem 1.5rem 3rem;
   text-align: center;

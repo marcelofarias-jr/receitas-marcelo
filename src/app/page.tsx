@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { useRecipesAccess } from "./state/recipes-context";
+import ContactForm from "../components/ContactForm";
 import CategoryChip from "../components/CategoryChip";
 import FeaturedItem from "../components/FeaturedItem";
 import FeaturedItemSkeleton from "../components/FeaturedItemSkeleton";
@@ -231,6 +232,19 @@ export default function Home() {
           </aside>
         </section>
       </main>
+
+      <section className={styles.contactSection}>
+        <div className={styles.contactInner}>
+          <div className={styles.contactHeader}>
+            <h2>Fale comigo</h2>
+            <p>
+              Tem uma sugestão de receita, uma dúvida ou só quer mandar um alô?
+              Preencha o formulário abaixo e responderei assim que possível.
+            </p>
+          </div>
+          <ContactForm />
+        </div>
+      </section>
 
       <footer className={styles.footer}>
         <p>Receitas do Marcelo - feito com carinho para reunir a familia.</p>
