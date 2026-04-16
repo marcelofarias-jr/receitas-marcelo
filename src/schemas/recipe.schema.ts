@@ -12,6 +12,7 @@ export const recipeFormSchema = z.object({
   ingredientesText: z.string().min(1, "Informe pelo menos um ingrediente."),
   preparoText: z.string().min(1, "Descreva o modo de preparo."),
   vegano: z.boolean().optional(),
+  publicada: z.boolean().optional(),
 });
 
 export type RecipeFormValues = z.infer<typeof recipeFormSchema>;

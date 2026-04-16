@@ -24,6 +24,7 @@ export const recipes = pgTable("recipes", {
   rendimento: text("rendimento").notNull(),
   acessos: integer("acessos").notNull().default(0),
   destaque: boolean("destaque").notNull().default(false),
+  publicada: boolean("publicada").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

@@ -9,7 +9,8 @@ import { broadcastUpdate } from "@/lib/updates-broadcaster";
 
 export async function GET() {
   try {
-    const receitas = await listRecipes(false);
+    const todasReceitas = await listRecipes(false);
+    const receitas = todasReceitas.filter((r) => r.publicada);
     const payload: RecipesData = {
       receitas,
       categorias: [],

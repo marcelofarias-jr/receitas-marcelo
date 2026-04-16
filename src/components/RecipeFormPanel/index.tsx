@@ -165,7 +165,7 @@ export default function RecipeFormPanel({
           <label htmlFor="resumo">Resumo</label>
           <textarea
             id="resumo"
-            rows={3}
+            rows={6}
             {...register("resumo")}
             aria-invalid={!!errors.resumo}
           />
@@ -329,7 +329,7 @@ export default function RecipeFormPanel({
           </label>
           <textarea
             id="preparoText"
-            rows={5}
+            rows={10}
             {...register("preparoText")}
             aria-invalid={!!errors.preparoText}
           />
@@ -345,6 +345,10 @@ export default function RecipeFormPanel({
           <label>
             <input type="checkbox" {...register("vegano")} />
             Vegano
+          </label>
+          <label>
+            <input type="checkbox" {...register("publicada")} />
+            Publicada
           </label>
         </div>
 

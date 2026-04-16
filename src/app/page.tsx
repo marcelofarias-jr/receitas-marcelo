@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./page.module.scss";
 import { useRecipesAccess } from "./state/recipes-context";
 import ContactForm from "../components/ContactForm";
@@ -52,10 +52,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [ingredientFilters, setIngredientFilters] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const fetchRecipes = () => {
-    setLoading(true);
+  const fetchRecipes = useCallback(() => {
     fetch("/api/receitas", { cache: "no-store" })
       .then((r) => r.json())
       .then((data: RecipesData) => {
@@ -63,20 +62,17 @@ export default function Home() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  };
-
-  const fetchRecipesRef = useRef(fetchRecipes);
-  fetchRecipesRef.current = fetchRecipes;
+  }, []);
 
   useEffect(() => {
-    fetchRecipesRef.current();
-  }, []);
+    fetchRecipes();
+  }, [fetchRecipes]);
 
   useEffect(() => {
     const eventSource = new EventSource("/api/updates");
-    eventSource.onmessage = () => fetchRecipesRef.current();
+    eventSource.onmessage = () => fetchRecipes();
     return () => eventSource.close();
-  }, []);
+  }, [fetchRecipes]);
 
   const featuredCount = featuredCountFallback;
   const categories = Array.from(new Set(recipes.map((recipe) => recipe.tipo)));
@@ -113,9 +109,7 @@ export default function Home() {
     return base.filter((recipe) => recipe.tipo === activeCategory);
   }, [activeCategory, recipes, isFiltering, searchResults]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, activeCategory, ingredientFilters]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const ingredientMatchCount = useMemo(() => {
     if (!ingredientFilters.length) return 0;
@@ -124,13 +118,11 @@ export default function Home() {
     ).length;
   }, [recipes, ingredientFilters]);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 10;
-
   const isIngredientSearch = ingredientFilters.length > 0;
   const noIngredientResults =
     isIngredientSearch && !loading && filteredRecipes.length === 0;
 
+  const PAGE_SIZE = 10;
   const totalPages = Math.ceil(filteredRecipes.length / PAGE_SIZE);
   const paginatedRecipes = filteredRecipes.slice(
     (currentPage - 1) * PAGE_SIZE,
@@ -157,7 +149,10 @@ export default function Home() {
                 key={category}
                 label={category}
                 isActive={category === activeCategory}
-                onSelect={setActiveCategory}
+                onSelect={(cat) => {
+                  setActiveCategory(cat);
+                  setCurrentPage(1);
+                }}
               />
             ))}
           </div>
@@ -170,6 +165,7 @@ export default function Home() {
             totalRecipes={recipes.length}
             onChange={(ings) => {
               setIngredientFilters(ings);
+              setCurrentPage(1);
               if (ings.length > 0) {
                 setSearchQuery("");
                 setActiveCategory(allCategory);
@@ -186,6 +182,7 @@ export default function Home() {
                 value={searchQuery}
                 onChange={(q) => {
                   setSearchQuery(q);
+                  setCurrentPage(1);
                   if (q) setActiveCategory(allCategory);
                 }}
                 placeholder="Buscar pelo nome da receita..."

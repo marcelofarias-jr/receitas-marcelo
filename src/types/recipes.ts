@@ -2,6 +2,7 @@ export type Recipe = {
   id: number;
   slug: string;
   deleted: boolean;
+  publicada: boolean;
   foto: string;
   titulo: string;
   resumo: string;

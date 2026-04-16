@@ -1,4 +1,5 @@
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import IconButton from "../UI/IconButton";
 import LoadingButton from "../UI/LoadingButton";
 import styles from "./RecipeListPanel.module.scss";
@@ -61,7 +62,16 @@ export default function RecipeListPanel({
                 disabled={isSubmitting}
                 aria-label="Editar receita"
                 title="Editar receita"
-              />
+              />{" "}
+              <Link
+                href={`/receitas/${recipe.slug}`}
+                target="_blank"
+                className={styles.viewButton}
+                aria-label="Ver receita publicada"
+                title="Ver receita publicada"
+              >
+                <ExternalLink size={16} />
+              </Link>{" "}
               <IconButton
                 icon={<Trash2 size={16} />}
                 isDanger

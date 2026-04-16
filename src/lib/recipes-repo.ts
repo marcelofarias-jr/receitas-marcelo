@@ -9,6 +9,7 @@ function mapRow(row: typeof recipes.$inferSelect): Recipe {
     id: row.id,
     slug: row.slug,
     deleted: row.deleted,
+    publicada: row.publicada,
     foto: row.foto,
     titulo: row.titulo,
     resumo: row.resumo,
@@ -55,6 +56,7 @@ export async function createRecipe(input: RecipeInput) {
     .values({
       slug,
       deleted: input.deleted ?? false,
+      publicada: input.publicada ?? false,
       foto: input.foto ?? "",
       titulo: input.titulo ?? "",
       resumo: input.resumo ?? "",
@@ -91,6 +93,7 @@ export async function updateRecipeBySlug(slug: string, input: RecipeInput) {
     .set({
       slug: nextSlug,
       deleted: input.deleted ?? current.deleted,
+      publicada: input.publicada ?? current.publicada,
       foto: input.foto ?? current.foto,
       titulo: input.titulo ?? current.titulo,
       resumo: input.resumo ?? current.resumo,

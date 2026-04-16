@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import styles from "./page.module.scss";
@@ -27,6 +28,7 @@ const emptyForm: RecipeFormValues = {
   ingredientesText: "",
   preparoText: "",
   vegano: false,
+  publicada: false,
 };
 
 function toLines(value: string): string[] {
@@ -81,7 +83,7 @@ export default function AdminPage() {
   const fetchRecipes = useCallback(async (): Promise<void> => {
     setIsFetchingRecipes(true);
     try {
-      const response = await fetch("/api/receitas", {
+      const response = await fetch("/api/admin/receitas", {
         cache: "no-store",
         credentials: "include",
       });
@@ -112,6 +114,7 @@ export default function AdminPage() {
         ingredientesText: toLineText(selectedRecipe.igredientes),
         preparoText: toLineText(selectedRecipe.preparo),
         vegano: selectedRecipe.vegano,
+        publicada: selectedRecipe.publicada,
       });
     } else {
       reset(emptyForm);
@@ -218,6 +221,7 @@ export default function AdminPage() {
       rendimento: `${values.rendimento} porcoes`,
       foto,
       vegano: values.vegano,
+      publicada: values.publicada ?? false,
       igredientes: toLines(values.ingredientesText),
       preparo: toLines(values.preparoText),
       culinária: toLines(values.culinariaText || ""),
@@ -331,6 +335,9 @@ export default function AdminPage() {
       <div className={styles.page}>
         <main className={styles.layout}>
           <div className={styles.sidebar}>
+            <Link href="/" className={styles.navLink}>
+              ← Ver receitas
+            </Link>
             <RecipeListPanel
               recipes={recipes}
               selectedSlug={selectedSlug}
