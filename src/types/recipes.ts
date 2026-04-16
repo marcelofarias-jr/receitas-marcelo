@@ -16,20 +16,8 @@ export type Recipe = {
   acessos: number;
 };
 
-export type Category = {
-  id: number;
-  nome: string;
-};
-
-export type Favorite = {
-  nome: string;
-  id: number;
-};
-
 export type RecipesData = {
   receitas: Recipe[];
-  categorias: Category[];
-  favoritos: Favorite[];
 };
 
 export type RecipeInput = Omit<
@@ -40,7 +28,5 @@ export type RecipeInput = Omit<
   acessos?: number;
   deleted?: boolean;
 };
-
-export type ImageMap = Record<string, string>;
 
 export type RecipeAccessMap = Record<number, number>;

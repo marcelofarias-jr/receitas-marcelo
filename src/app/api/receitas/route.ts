@@ -13,8 +13,6 @@ export async function GET() {
     const receitas = todasReceitas.filter((r) => r.publicada);
     const payload: RecipesData = {
       receitas,
-      categorias: [],
-      favoritos: [],
     };
     return NextResponse.json(payload);
   } catch {

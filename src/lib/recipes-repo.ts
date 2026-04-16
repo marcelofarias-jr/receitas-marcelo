@@ -2,7 +2,22 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../db";
 import { recipes } from "../db/schema";
 import type { Recipe, RecipeInput } from "../types/recipes";
-import { ensureUniqueSlug } from "./recipes-store";
+import { slugify } from "./slugify";
+
+function ensureUniqueSlug(slug: string, existing: Recipe[], id?: number) {
+  const base = slugify(slug);
+  let unique = base;
+  let counter = 2;
+
+  while (
+    existing.some((recipe) => recipe.slug === unique && recipe.id !== id)
+  ) {
+    unique = `${base}-${counter}`;
+    counter += 1;
+  }
+
+  return unique;
+}
 
 function mapRow(row: typeof recipes.$inferSelect): Recipe {
   return {

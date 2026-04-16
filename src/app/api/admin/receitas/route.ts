@@ -19,8 +19,6 @@ export async function GET(request: NextRequest) {
     const receitas = await listRecipes(false);
     const payload: RecipesData = {
       receitas,
-      categorias: [],
-      favoritos: [],
     };
     return NextResponse.json(payload);
   } catch {

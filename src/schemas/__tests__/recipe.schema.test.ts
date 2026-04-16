@@ -79,7 +79,7 @@ describe("recipeFormSchema", () => {
   });
 
   it("rejeita quando campo obrigatório está ausente", () => {
-    const { titulo, ...semTitulo } = dadosValidos;
+    const { titulo: _, ...semTitulo } = dadosValidos;
     const resultado = recipeFormSchema.safeParse(semTitulo);
     expect(resultado.success).toBe(false);
   });
