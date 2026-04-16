@@ -1,3 +1,10 @@
+.title {
+  font-size: 2.1rem;
+  font-family: var(--font-display), "Playfair Display", serif;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
 .header {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -20,7 +27,9 @@
 }
 
 .summary {
-  color: var(--color-muted);
+  color: var(--color-brown);
+  font-size: 1.2rem;
+  font-family: var(--font-serif), "Lora", serif;
   line-height: 1.7;
 }
 

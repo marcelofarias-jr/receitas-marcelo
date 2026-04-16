@@ -4,12 +4,14 @@
   border-radius: var(--radius-md);
   background: var(--color-primary);
   color: var(--color-bg);
+  font-family: var(--font-button), "Montserrat", Arial, sans-serif;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    background: var(--color-primary-dark, #d97706);
+    background: var(--color-orange);
+    color: var(--color-white);
     transform: translateY(-2px);
     box-shadow: var(--shadow-card);
   }
@@ -20,10 +22,19 @@
   }
 
   &.danger {
-    background: var(--color-error, #d9534f);
+    background: var(--color-error, #e74c3c);
 
     &:hover:not(:disabled) {
-      background: var(--color-error-dark, #c9302c);
+      background: var(--color-brown, #8b4513);
+      color: var(--color-white);
+    }
+  }
+
+  &.success {
+    background: var(--color-green);
+
+    &:hover:not(:disabled) {
+      background: var(--color-green-alt);
     }
   }
 
