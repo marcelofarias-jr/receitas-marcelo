@@ -24,7 +24,6 @@ const featuredCountFallback = 5;
 const allCategory = "Todas";
 
 function getImageUrl(recipe: Recipe): string {
-  // Só aceita URLs externas (http/https) ou paths locais em /uploads/
   if (recipe.foto.startsWith("http://") || recipe.foto.startsWith("https://")) {
     return recipe.foto;
   }
@@ -33,7 +32,6 @@ function getImageUrl(recipe: Recipe): string {
     return recipe.foto;
   }
 
-  // Se for nome de arquivo sem path, tenta em /uploads/
   if (
     recipe.foto &&
     !recipe.foto.includes("/") &&
@@ -42,7 +40,6 @@ function getImageUrl(recipe: Recipe): string {
     return `/uploads/${recipe.foto}`;
   }
 
-  // Nenhuma imagem válida
   return "";
 }
 
