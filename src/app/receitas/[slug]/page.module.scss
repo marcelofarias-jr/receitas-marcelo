@@ -12,6 +12,16 @@
 }
 
 .backLink {
+  width: fit-content;
+  border-radius: 12px;
+  padding: 0.2rem 1rem;
+  border: 1px solid transparent;
   font-weight: 600;
   color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  &:hover {
+    border: 1px solid white;
+  }
 }

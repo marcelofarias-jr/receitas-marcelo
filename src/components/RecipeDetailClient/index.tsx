@@ -7,6 +7,7 @@ import RecipeHeader from "../RecipeHeader";
 import RecipeIngredients from "../RecipeIngredients";
 import RecipeSteps from "../RecipeSteps";
 import type { Recipe } from "../../types/recipes";
+import { ArrowLeft } from "lucide-react";
 
 function getImageUrl(recipe: Recipe): string {
   if (recipe.foto.startsWith("http://") || recipe.foto.startsWith("https://")) {
@@ -61,6 +62,7 @@ export default function RecipeDetailClient({ slug, initialRecipe }: Props) {
     <div className={styles.page}>
       <main className={styles.main}>
         <Link href="/" className={styles.backLink}>
+          <ArrowLeft />
           Voltar para as receitas
         </Link>
         <RecipeHeader recipe={recipe} imageUrl={imageUrl} />

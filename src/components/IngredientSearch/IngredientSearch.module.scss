@@ -12,6 +12,11 @@
   transition:
     border-color 0.25s,
     box-shadow 0.25s;
+
+  @media (max-width: 1024px) {
+    position: static;
+    top: unset;
+  }
 }
 
 .panelActive {
