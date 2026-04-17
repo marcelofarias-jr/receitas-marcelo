@@ -1,6 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { createRecipe, listRecipes } from "@/lib/recipes-repo";
-import type { RecipeInput, RecipesData } from "@/types/recipes";
+import { listarReceitas, criarReceita } from "@/controllers/receitasController";
 import {
   verifyAdminRequest,
   unauthorizedResponse,
@@ -8,39 +7,37 @@ import {
 import { broadcastUpdate } from "@/lib/updates-broadcaster";
 
 export async function GET() {
-  try {
-    const todasReceitas = await listRecipes(false);
-    const receitas = todasReceitas.filter((r) => r.publicada);
-    const payload: RecipesData = {
-      receitas,
-    };
-    return NextResponse.json(payload);
-  } catch {
+  const result = await listarReceitas(true);
+
+  if (result.error) {
     return NextResponse.json(
-      { error: "Erro ao buscar receitas" },
-      { status: 500 },
+      { error: result.error },
+      { status: result.status },
     );
   }
+
+  return NextResponse.json({ receitas: result.data });
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const isAdmin = await verifyAdminRequest(request);
+  const isAdmin = await verifyAdminRequest(request);
 
-    if (!isAdmin) {
-      return unauthorizedResponse(
-        "Acesso negado. Autenticação de admin necessária.",
-      );
-    }
-
-    const payload = (await request.json()) as RecipeInput;
-    const recipe = await createRecipe(payload);
-    broadcastUpdate();
-    return NextResponse.json(recipe, { status: 201 });
-  } catch {
-    return NextResponse.json(
-      { error: "Erro ao criar receita" },
-      { status: 500 },
+  if (!isAdmin) {
+    return unauthorizedResponse(
+      "Acesso negado. Autenticação de admin necessária.",
     );
   }
+
+  const payload: unknown = await request.json();
+  const result = await criarReceita(payload);
+
+  if (result.error) {
+    return NextResponse.json(
+      { error: result.error },
+      { status: result.status },
+    );
+  }
+
+  broadcastUpdate();
+  return NextResponse.json(result.data, { status: 201 });
 }

@@ -1,10 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import {
-  getRecipeBySlug,
-  softDeleteRecipe,
-  updateRecipeBySlug,
-} from "@/lib/recipes-repo";
-import type { RecipeInput } from "@/types/recipes";
+  buscarReceita,
+  atualizarReceita,
+  deletarReceita,
+} from "@/controllers/receitasController";
 import {
   verifyAdminRequest,
   unauthorizedResponse,
@@ -16,85 +15,62 @@ type Params = {
 };
 
 export async function GET(_: Request, { params }: Params) {
-  try {
-    const { slug } = await params;
-    const recipe = await getRecipeBySlug(slug);
+  const { slug } = await params;
+  const result = await buscarReceita(slug);
 
-    if (!recipe || recipe.deleted) {
-      return NextResponse.json(
-        { error: "Receita não encontrada" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json(recipe);
-  } catch {
+  if (result.error) {
     return NextResponse.json(
-      { error: "Erro ao buscar receita" },
-      { status: 500 },
+      { error: result.error },
+      { status: result.status },
     );
   }
+
+  return NextResponse.json(result.data);
 }
 
 export async function PUT(request: NextRequest, { params }: Params) {
-  try {
-    // Verificar autenticação de admin
-    const isAdmin = await verifyAdminRequest(request);
+  const isAdmin = await verifyAdminRequest(request);
 
-    if (!isAdmin) {
-      return unauthorizedResponse(
-        "Acesso negado. Autenticação de admin necessária.",
-      );
-    }
-
-    const { slug } = await params;
-    const payload = (await request.json()) as RecipeInput;
-    const updated = await updateRecipeBySlug(slug, payload);
-
-    if (!updated) {
-      return NextResponse.json(
-        { error: "Receita não encontrada" },
-        { status: 404 },
-      );
-    }
-
-    broadcastUpdate();
-    return NextResponse.json(updated);
-  } catch {
-    return NextResponse.json(
-      { error: "Erro ao atualizar receita" },
-      { status: 500 },
+  if (!isAdmin) {
+    return unauthorizedResponse(
+      "Acesso negado. Autenticação de admin necessária.",
     );
   }
+
+  const { slug } = await params;
+  const payload: unknown = await request.json();
+  const result = await atualizarReceita(slug, payload);
+
+  if (result.error) {
+    return NextResponse.json(
+      { error: result.error },
+      { status: result.status },
+    );
+  }
+
+  broadcastUpdate();
+  return NextResponse.json(result.data);
 }
 
 export async function DELETE(request: NextRequest, { params }: Params) {
-  try {
-    // Verificar autenticação de admin
-    const isAdmin = await verifyAdminRequest(request);
+  const isAdmin = await verifyAdminRequest(request);
 
-    if (!isAdmin) {
-      return unauthorizedResponse(
-        "Acesso negado. Autenticação de admin necessária.",
-      );
-    }
-
-    const { slug } = await params;
-    const ok = await softDeleteRecipe(slug);
-
-    if (!ok) {
-      return NextResponse.json(
-        { error: "Receita não encontrada" },
-        { status: 404 },
-      );
-    }
-
-    broadcastUpdate();
-    return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json(
-      { error: "Erro ao deletar receita" },
-      { status: 500 },
+  if (!isAdmin) {
+    return unauthorizedResponse(
+      "Acesso negado. Autenticação de admin necessária.",
     );
   }
+
+  const { slug } = await params;
+  const result = await deletarReceita(slug);
+
+  if (result.error) {
+    return NextResponse.json(
+      { error: result.error },
+      { status: result.status },
+    );
+  }
+
+  broadcastUpdate();
+  return NextResponse.json(result.data);
 }

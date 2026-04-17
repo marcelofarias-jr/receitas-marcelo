@@ -5,9 +5,9 @@ export const dynamic = "force-dynamic";
 
 import RecipeDetailClient from "../../../components/RecipeDetailClient";
 import {
-  getRecipeBySlug,
-  incrementRecipeAccessBySlug,
-} from "../../../lib/recipes-repo";
+  buscarReceita,
+  incrementarAcesso,
+} from "../../../controllers/receitasController";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -17,11 +17,13 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const recipe = await getRecipeBySlug(slug);
+  const result = await buscarReceita(slug);
 
-  if (!recipe || recipe.deleted) {
+  if (result.error !== null) {
     return { title: "Receita não encontrada | Receitas do Marcelo" };
   }
+
+  const recipe = result.data;
 
   const ingredientesPrincipais = recipe.igredientes.slice(0, 5).join(", ");
   const descricao = recipe.resumo
@@ -63,13 +65,15 @@ export async function generateMetadata({
 
 export default async function RecipePage({ params }: PageProps) {
   const { slug } = await params;
-  const recipe = await getRecipeBySlug(slug);
+  const result = await buscarReceita(slug);
 
-  if (!recipe || recipe.deleted) {
+  if (result.error !== null) {
     notFound();
   }
 
-  await incrementRecipeAccessBySlug(slug);
+  const recipe = result.data;
+
+  await incrementarAcesso(slug);
 
   const jsonLd = {
     "@context": "https://schema.org",
