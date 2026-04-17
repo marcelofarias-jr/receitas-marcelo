@@ -91,7 +91,6 @@ html,
 body {
   min-height: 100%;
   width: 100%;
-  overflow-x: hidden;
 }
 
 html {
@@ -99,6 +98,7 @@ html {
 }
 
 body {
+  overflow-x: hidden;
   font-family: var(--font-serif), "Lora", serif;
   color: var(--color-text-primary);
   background: linear-gradient(

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import "./globals.scss";
 import { RecipesProvider } from "./state/recipes-context";
 import ThemeToggle from "../components/ThemeToggle";
+import ScrollReset from "../components/ScrollReset";
 
 const display = Playfair_Display({
   variable: "--font-display",
@@ -53,6 +54,7 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body>
+        <ScrollReset />
         <RecipesProvider>{children}</RecipesProvider>
         <ThemeToggle />
       </body>
