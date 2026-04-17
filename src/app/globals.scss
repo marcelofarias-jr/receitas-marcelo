@@ -94,6 +94,10 @@ body {
   overflow-x: hidden;
 }
 
+html {
+  background-color: var(--color-bg);
+}
+
 body {
   font-family: var(--font-serif), "Lora", serif;
   color: var(--color-text-primary);
@@ -104,9 +108,7 @@ body {
   );
   font-size: var(--font-size-xs);
   position: relative;
-  transition:
-    background 0.3s ease,
-    color 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 body::before {

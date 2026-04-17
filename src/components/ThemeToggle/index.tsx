@@ -34,8 +34,6 @@ export default function ThemeToggle() {
   const toggle = useCallback(() => {
     const next = theme === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
-    // Force a repaint on mobile browsers by triggering a reflow
-    void document.documentElement.offsetHeight;
     document.cookie = `theme=${next};path=/;max-age=31536000;SameSite=Lax`;
   }, [theme]);
 
