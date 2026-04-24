@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -59,6 +59,13 @@ export default function AdminPage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  const scrollToForm = (): void => {
+    if (window.innerWidth <= 768) {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   const methods = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeFormSchema),
@@ -88,6 +95,7 @@ export default function AdminPage() {
         cache: "no-store",
         credentials: "include",
       });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = (await response.json()) as RecipesData;
       setRecipes((data.receitas ?? []).filter((recipe) => !recipe.deleted));
     } catch (error) {
@@ -126,9 +134,9 @@ export default function AdminPage() {
     const run = async (): Promise<void> => {
       try {
         const response = await fetch("/api/admin/me", { cache: "no-store" });
-        const data = (await response.json()) as { ok: boolean };
-        setAuthed(data.ok);
-        if (data.ok) {
+        const isAuthed = response.ok;
+        setAuthed(isAuthed);
+        if (isAuthed) {
           await fetchRecipes();
         }
       } catch (error) {
@@ -291,6 +299,7 @@ export default function AdminPage() {
 
   const handleNew = (): void => {
     setSelectedSlug(null);
+    scrollToForm();
   };
 
   const handleLogout = async (): Promise<void> => {
@@ -313,6 +322,7 @@ export default function AdminPage() {
 
   const handleEdit = (recipe: Recipe): void => {
     setSelectedSlug(recipe.slug);
+    scrollToForm();
   };
 
   if (!authed) {
@@ -359,14 +369,16 @@ export default function AdminPage() {
             </Button>
           </div>
           <FormProvider {...methods}>
-            <RecipeFormPanel
-              key={selectedSlug ?? "new"}
-              selectedRecipe={selectedRecipe}
-              isSubmitting={isSubmitting}
-              isUploadingImage={isUploadingImage}
-              onSubmit={methods.handleSubmit(onSubmit)}
-              availableTypes={availableTypes}
-            />
+            <div ref={formRef}>
+              <RecipeFormPanel
+                key={selectedSlug ?? "new"}
+                selectedRecipe={selectedRecipe}
+                isSubmitting={isSubmitting}
+                isUploadingImage={isUploadingImage}
+                onSubmit={methods.handleSubmit(onSubmit)}
+                availableTypes={availableTypes}
+              />
+            </div>
           </FormProvider>
         </main>
         <DeleteModal

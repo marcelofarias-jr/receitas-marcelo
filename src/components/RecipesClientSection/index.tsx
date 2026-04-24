@@ -58,7 +58,10 @@ export default function RecipesClientSection({ initialRecipes }: Props) {
       controller = new AbortController();
 
       fetch("/api/receitas", { cache: "no-store", signal: controller.signal })
-        .then((r) => r.json())
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        })
         .then((data: RecipesData) => setRecipes(data.receitas ?? []))
         .catch((error: unknown) => {
           if (error instanceof Error && error.name !== "AbortError") {

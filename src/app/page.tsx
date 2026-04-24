@@ -7,7 +7,7 @@ import RecipesClientSection from "../components/RecipesClientSection";
 
 export default async function Home() {
   const result = await listarReceitas(true);
-  const recipes = result.error ? [] : result.data;
+  const recipes = result.error === null ? result.data : [];
 
   return (
     <div className={styles.page}>
