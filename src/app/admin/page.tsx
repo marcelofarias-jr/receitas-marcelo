@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import styles from "./page.module.scss";
+import Button from "../../components/UI/Button";
 import AdminAuthCard from "../../components/AdminAuthCard";
 import DeleteModal from "../../components/DeleteModal";
 import RecipeListPanel from "../../components/RecipeListPanel";
@@ -347,13 +348,15 @@ export default function AdminPage() {
               onEdit={handleEdit}
               onRequestDelete={setPendingDelete}
             />
-            <button
-              className={styles.logoutButton}
+            <Button
+              variant="danger"
+              fullWidth
               onClick={() => void handleLogout()}
-              disabled={isLoggingOut}
+              isLoading={isLoggingOut}
+              loadingText="Saindo..."
             >
-              {isLoggingOut ? "Saindo..." : "Sair"}
-            </button>
+              Sair
+            </Button>
           </div>
           <FormProvider {...methods}>
             <RecipeFormPanel

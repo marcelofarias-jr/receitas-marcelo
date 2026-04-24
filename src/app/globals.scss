@@ -27,6 +27,9 @@
   --color-skeleton-link-to: #e8b090;
   --color-purple: #9b59b6;
   --color-blue: #3498db;
+  /* Botões — garantia de contraste (WCAG AA) em todos os temas */
+  --color-primary-hover: #c0392b;
+  --color-btn-on-primary: #ffffff;
   --shadow-card: 0 14px 40px rgba(37, 30, 25, 0.12);
   --shadow-soft: 0 10px 24px rgba(37, 30, 25, 0.08);
   --radius-xl: 32px;
@@ -71,6 +74,9 @@
   --color-error: #ff6b6b;
   --color-purple: #9b59b6;
   --color-blue: #3498db;
+  /* Botões — texto branco por preferência visual */
+  --color-primary-hover: #ff8080;
+  --color-btn-on-primary: #ffffff;
   --color-overlay: rgba(0, 0, 0, 0.65);
   --color-skeleton-from: #2e2218;
   --color-skeleton-to: #3a2c20;

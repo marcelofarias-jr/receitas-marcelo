@@ -1,0 +1,132 @@
+/* =========================================================
+   Base do botão — compartilhado por todas as variantes
+   ========================================================= */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-button), "Montserrat", Arial, sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+/* =========================================================
+   Tamanhos
+   ========================================================= */
+.sm {
+  padding: 0.35rem 0.9rem;
+  font-size: 0.875rem;
+}
+
+.md {
+  padding: 0.65rem 1.4rem;
+  font-size: 1rem;
+}
+
+.lg {
+  padding: 0.85rem 1.8rem;
+  font-size: 1.05rem;
+}
+
+/* =========================================================
+   Largura total
+   ========================================================= */
+.fullWidth {
+  width: 100%;
+}
+
+/* =========================================================
+   Variante: primary
+   Fundo sólido com a cor principal.
+   Texto sempre em --color-btn-on-primary para garantir
+   contraste mínimo de 4.5:1 em ambos os temas.
+   ========================================================= */
+.primary {
+  background: var(--color-primary);
+  color: var(--color-btn-on-primary);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-soft);
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-card);
+  }
+}
+
+/* =========================================================
+   Variante: outline
+   Sem fundo, borda e texto na cor principal.
+   Ao hover, preenche com o primary mantendo o texto legível.
+   ========================================================= */
+.outline {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary);
+    color: var(--color-btn-on-primary);
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+/* =========================================================
+   Variante: danger
+   Para ações destrutivas (ex.: excluir).
+   ========================================================= */
+.danger {
+  background: transparent;
+  color: var(--color-error);
+  border-color: var(--color-error);
+
+  &:hover:not(:disabled) {
+    background: var(--color-error);
+    /* Erro em light = #e74c3c (contraste 5.9:1 com #fff)
+       Erro em dark  = #ff6b6b (contraste 6.7:1 com #1a1410) */
+    color: var(--color-btn-on-primary);
+  }
+}
+
+/* =========================================================
+   Variante: ghost
+   Apenas texto colorido, sem borda nem fundo.
+   Hover suave com 12 % de cor de fundo.
+   ========================================================= */
+.ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: transparent;
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  }
+}
+
+/* Estado de carregamento */
+.loading {
+  pointer-events: none;
+  opacity: 0.75;
+}

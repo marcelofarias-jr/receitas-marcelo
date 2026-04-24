@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useFormContext } from "react-hook-form";
 import Image from "next/image";
-import LoadingButton from "../UI/LoadingButton";
+import Button from "../UI/Button";
 import styles from "./RecipeFormPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
 import type { RecipeFormValues } from "../../schemas/recipe.schema";
@@ -354,13 +354,13 @@ export default function RecipeFormPanel({
 
         {/* Submit Button */}
         <div className={styles.actions}>
-          <LoadingButton
+          <Button
             type="submit"
             isLoading={isSubmitting || isUploadingImage}
             loadingText="Salvando..."
           >
             Salvar
-          </LoadingButton>
+          </Button>
         </div>
       </form>
     </section>

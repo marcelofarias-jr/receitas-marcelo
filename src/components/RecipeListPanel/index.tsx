@@ -1,7 +1,7 @@
 import { Pencil, Plus, Trash2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import IconButton from "../UI/IconButton";
-import LoadingButton from "../UI/LoadingButton";
+import Button from "../UI/Button";
 import styles from "./RecipeListPanel.module.scss";
 import type { Recipe } from "../../types/recipes";
 
@@ -32,15 +32,10 @@ export default function RecipeListPanel({
             <h1>Receitas</h1>
             <p>Selecione uma receita para editar.</p>
           </div>
-          <LoadingButton
-            type="button"
-            isLoading={false}
-            onClick={onNew}
-            className={styles.newButton}
-          >
+          <Button type="button" size="sm" onClick={onNew}>
             <Plus size={16} aria-hidden="true" />
             Nova receita
-          </LoadingButton>
+          </Button>
         </div>
       </div>
       <div className={styles.recipeList}>

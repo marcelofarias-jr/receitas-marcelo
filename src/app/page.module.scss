@@ -165,7 +165,7 @@
   &:hover:not(:disabled) {
     background: var(--color-primary);
     border-color: var(--color-primary);
-    color: #fff;
+    color: var(--color-btn-on-primary);
   }
 
   &:disabled {

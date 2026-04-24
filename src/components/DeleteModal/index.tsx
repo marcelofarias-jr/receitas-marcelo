@@ -1,4 +1,4 @@
-import LoadingButton from "../UI/LoadingButton";
+import Button from "../UI/Button";
 import styles from "./DeleteModal.module.scss";
 
 type DeleteModalProps = {
@@ -24,18 +24,18 @@ export default function DeleteModal({
         <h3>Confirmar exclusao</h3>
         <p>Tem certeza que deseja excluir esta receita?</p>
         <div className={styles.modalActions}>
-          <button type="button" onClick={onCancel}>
+          <Button variant="outline" type="button" onClick={onCancel}>
             Cancelar
-          </button>
-          <LoadingButton
+          </Button>
+          <Button
+            variant="danger"
             type="button"
-            isDanger
             isLoading={isSubmitting}
             loadingText="Excluindo..."
             onClick={onConfirm}
           >
             Excluir
-          </LoadingButton>
+          </Button>
         </div>
       </div>
     </div>

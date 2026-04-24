@@ -8,6 +8,7 @@ import {
   contactFormSchema,
   type ContactFormValues,
 } from "@/schemas/contact.schema";
+import Button from "../UI/Button";
 import styles from "./ContactForm.module.scss";
 
 const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!;
@@ -131,13 +132,14 @@ export default function ContactForm() {
       </div>
 
       <div className={styles.actions}>
-        <button
+        <Button
           type="submit"
-          className={styles.submitButton}
-          disabled={status === "loading"}
+          size="lg"
+          isLoading={status === "loading"}
+          loadingText="Enviando..."
         >
-          {status === "loading" ? "Enviando..." : "Enviar mensagem"}
-        </button>
+          Enviar mensagem
+        </Button>
       </div>
     </form>
   );
