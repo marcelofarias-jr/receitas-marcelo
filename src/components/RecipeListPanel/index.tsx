@@ -39,45 +39,53 @@ export default function RecipeListPanel({
         </div>
       </div>
       <div className={styles.recipeList}>
-        {isFetchingRecipes ? (
-          <p className={styles.loadingText}>Carregando receitas...</p>
-        ) : null}
-        {recipes.map((recipe) => (
-          <div
-            key={recipe.slug}
-            className={`${styles.recipeRow} ${
-              recipe.slug === selectedSlug ? styles.recipeItemActive : ""
-            }`}
-          >
-            <strong>{recipe.titulo}</strong>
-            <div className={styles.recipeActions}>
-              <IconButton
-                icon={<Pencil size={16} />}
-                onClick={() => onEdit(recipe)}
-                disabled={isSubmitting}
-                aria-label="Editar receita"
-                title="Editar receita"
-              />{" "}
-              <Link
-                href={`/receitas/${recipe.slug}`}
-                target="_blank"
-                className={styles.viewButton}
-                aria-label="Ver receita publicada"
-                title="Ver receita publicada"
+        {isFetchingRecipes
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className={styles.skeletonRow} aria-hidden="true">
+                <div className={styles.skeletonTitle} />
+                <div className={styles.skeletonActions}>
+                  <div className={styles.skeletonIcon} />
+                  <div className={styles.skeletonIcon} />
+                  <div className={styles.skeletonIcon} />
+                </div>
+              </div>
+            ))
+          : recipes.map((recipe) => (
+              <div
+                key={recipe.slug}
+                className={`${styles.recipeRow} ${
+                  recipe.slug === selectedSlug ? styles.recipeItemActive : ""
+                }`}
               >
-                <ExternalLink size={16} />
-              </Link>{" "}
-              <IconButton
-                icon={<Trash2 size={16} />}
-                isDanger
-                onClick={() => onRequestDelete(recipe.slug)}
-                disabled={isSubmitting}
-                aria-label="Excluir receita"
-                title="Excluir receita"
-              />
-            </div>
-          </div>
-        ))}
+                <strong>{recipe.titulo}</strong>
+                <div className={styles.recipeActions}>
+                  <IconButton
+                    icon={<Pencil size={16} />}
+                    onClick={() => onEdit(recipe)}
+                    disabled={isSubmitting}
+                    aria-label="Editar receita"
+                    title="Editar receita"
+                  />{" "}
+                  <Link
+                    href={`/receitas/${recipe.slug}`}
+                    target="_blank"
+                    className={styles.viewButton}
+                    aria-label="Ver receita publicada"
+                    title="Ver receita publicada"
+                  >
+                    <ExternalLink size={16} />
+                  </Link>{" "}
+                  <IconButton
+                    icon={<Trash2 size={16} />}
+                    isDanger
+                    onClick={() => onRequestDelete(recipe.slug)}
+                    disabled={isSubmitting}
+                    aria-label="Excluir receita"
+                    title="Excluir receita"
+                  />
+                </div>
+              </div>
+            ))}
       </div>
     </section>
   );

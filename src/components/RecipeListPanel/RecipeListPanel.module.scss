@@ -112,7 +112,56 @@
   box-shadow: var(--shadow-soft);
 }
 
-.loadingText {
-  color: var(--color-muted);
-  font-size: 0.9rem;
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-warm-tint);
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.skeletonTitle {
+  flex: 1;
+  height: 0.875rem;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from) 25%,
+    var(--color-skeleton-to) 50%,
+    var(--color-skeleton-from) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.skeletonIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from) 25%,
+    var(--color-skeleton-to) 50%,
+    var(--color-skeleton-from) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
