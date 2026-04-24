@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Spinner from "../UI/Spinner";
 import RecipeImage from "../UI/RecipeImage";
 import CategoryTag from "../UI/CategoryTag";
 import styles from "./HomeHero.module.scss";
@@ -8,14 +7,9 @@ import type { Recipe } from "../../types/recipes";
 type HomeHeroProps = {
   heroRecipe: Recipe | null;
   heroImage: string;
-  loading?: boolean;
 };
 
-export default function HomeHero({
-  heroRecipe,
-  heroImage,
-  loading,
-}: HomeHeroProps) {
+export default function HomeHero({ heroRecipe, heroImage }: HomeHeroProps) {
   return (
     <header className={styles.hero}>
       <div className={styles.heroContent}>
@@ -31,19 +25,7 @@ export default function HomeHero({
           </a>
         </div>
       </div>
-      {loading ? (
-        <div className={styles.heroCard}>
-          <div className={styles.heroCardImageSkeleton}>
-            <Spinner size="lg" />
-          </div>
-          <div className={styles.heroCardBody}>
-            <div className={styles.skeletonTag} />
-            <div className={styles.skeletonTitle} />
-            <div className={styles.skeletonText} />
-            <div className={styles.skeletonLink} />
-          </div>
-        </div>
-      ) : heroRecipe ? (
+      {heroRecipe ? (
         <div className={styles.heroCard}>
           <div className={styles.heroCardImage}>
             <RecipeImage
